@@ -1,0 +1,25 @@
+[
+  {
+      "pregunta": "hola",
+      "respuesta": "¡Hola! ¿En qué puedo ayudarte?"
+  },
+  {
+      "pregunta": "como estás",
+      "respuesta": "Estoy bien, ¡gracias por preguntar!"
+  },
+  {
+      "pregunta": "que es la inteligencia artificial",
+      "respuesta": "La inteligencia artificial es una rama de la informática que se encarga de crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana."
+  },
+  {
+      "pregunta": "quien es tu creador?",
+      "respuesta": "Soy un bot creado por Mateo Escudero en Samsung Innovation Campus."
+  },
+  
+  {
+    "pregunta": "entraste en la base de datos?",
+    "respuesta": "si capo obvio"
+    }
+
+
+]
