@@ -3,12 +3,12 @@ import telebot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import TELEGRAM_TOKEN
 from core.dataset import cargar_dataset, buscar_en_dataset
-from apis.groq_api import respuesta_groq
+from apis.groq_api import get_groq_response, transcribe_voice_with_groq
 from apis.sentimiento import analizador_sentimiento
 from apis.open_router_api import respuesta_seek
 
 # Cargar dataset una sola vez
-dataset = cargar_dataset()
+bank_data = cargar_dataset()
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
@@ -61,85 +61,65 @@ def cmd_sentimiento(message):
     bot.reply_to(message, resultado)
 
 
-# -----------------------------
-# 3. Comando /preguntas
+## -----------------------------
+# 2. Handler General
 # -----------------------------
 
+bot.message_handler(commands=["start"])
 
-@bot.message_handler(commands=["preguntas"])
-def cmd_verbd(message):
-    if not dataset:
-        bot.reply_to(message, "La base de datos está vacía.")
+
+def welcome_message(message: telebot.types.Message):
+    if not bank_data:
+        bot.reply_to(message, "Error cargando datos de los bancos.")
         return
 
-    preguntas = [f"- {item['pregunta']}" for item in dataset]
-    texto = "Preguntas disponibles en la base de datos:\n" + "\n".join(preguntas)
-    enviar_mensaje_largo(bot, message.chat.id, texto)
-
-
-# -----------------------------
-# 4. Handler general (con menú)
-# -----------------------------
-
-
-@bot.message_handler(func=lambda message: True)
-def pedir_opcion(message):
-    chat_id = message.chat.id
-    texto = message.text
-
-    # Primero probamos con el dataset
-    respuesta = buscar_en_dataset(texto, dataset)
-    if respuesta:
-        bot.reply_to(message, respuesta)
-        return
-
-    # Si no está en el dataset, pedimos elección de IA
-    ultimo_mensaje[chat_id] = texto
-
-    markup = InlineKeyboardMarkup()
-    markup.row_width = 2
-    markup.add(
-        InlineKeyboardButton("🤖 ChatGPT", callback_data="chatgpt"),
-        InlineKeyboardButton("🧠 DeepSeek", callback_data="deepseek"),
+    welcome_message = (
+        "💰 ¡Hola! Soy el bot informativo sobre bancos en Argentina.\n"
+        "Podés consultarme tarifas, costos de mantenimiento o comparar entidades."
     )
-    bot.send_message(
-        chat_id,
-        "No encontré nada en la base. ¿Con qué IA querés que te responda?",
-        reply_markup=markup,
-    )
+    bot.reply_to(message, welcome_message)
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def responder_callback(call):
-    chat_id = call.message.chat.id
-    texto_original = ultimo_mensaje.get(chat_id, "")
+@bot.message_handler(content_types=["text"])
+def handle_text_message(message: telebot.types.Message):
+    if not bank_data:
+        bot.reply_to(
+            message, "Error cargando los datos de los bancos. Intente más tarde."
+        )
+        return
+    bot.send_chat_action(message.chat.id, "typing")
+    response = get_groq_response(message.text)
+    if response:
+        bot.reply_to(message, response)
+    else:
+        bot.reply_to(
+            message,
+            "❌ Lo siento, hubo un error al procesar tu consulta.\n"
+            "Podés escribirnos a info@codificardev.com.ar para más información.",
+        )
 
-    if not texto_original:
-        bot.send_message(chat_id, "No encontré el mensaje original.")
+
+@bot.message_handler(content_types=["voice"])
+def handle_voice_message(message: telebot.types.Message):
+    if not bank_data:
+        bot.reply_to(message, "Error cargando datos de bancos. Intente más tarde.")
         return
 
-    # Mostrar "escribiendo..." antes de responder
-    bot.send_chat_action(chat_id, "typing")
-    time.sleep(1)
+    bot.send_chat_action(message.chat.id, "typing")
+    transcription = transcribe_voice_with_groq(message)
+    if not transcription:
+        bot.reply_to(message, "❌ No pude transcribir el audio. Probá de nuevo.")
+        return
 
-    if call.data == "chatgpt":
-        try:
-            respuesta = respuesta_groq(texto_original)
-            enviar_mensaje_largo(bot, chat_id, f"🤖 *ChatGPT dice:*\n{respuesta}")
-        except Exception as e:
-            bot.send_message(chat_id, "⚠️ Error al pedir respuesta a ChatGPT.")
-            print(f"Error ChatGPT: {e}")
-
-    elif call.data == "deepseek":
-        try:
-            respuesta = respuesta_seek(texto_original)
-            enviar_mensaje_largo(bot, chat_id, f"🧠 *DeepSeek dice:*\n{respuesta}")
-        except Exception as e:
-            bot.send_message(chat_id, "⚠️ Error al pedir respuesta a DeepSeek.")
-            print(f"Error DeepSeek: {e}")
-
-    # Eliminamos el menú del chat
-    bot.delete_message(chat_id, call.message.message_id)
+    response = get_groq_response(transcription)
+    if response:
+        bot.reply_to(message, response)
+    else:
+        bot.reply_to(
+            message,
+            "❌ Ocurrió un error al procesar tu consulta.\n"
+            "Podés escribirnos a info@codificardev.com.ar para más información.",
+        )
 
 
 # -----------------------------
