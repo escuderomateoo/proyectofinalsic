@@ -1,3 +1,22 @@
+# Ignorar el entorno virtual
 /entorno_bot
-.env
-*__pycache__/
+
+# Ignorar datos locales
+#Datos/
+
+# Archivos temporales de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de logs
+*.log
+
+# Configuración o variables secretas
+*.env
+*.token
