@@ -2,7 +2,7 @@
 /entorno_bot
 
 # Ignorar datos locales
-#Datos/
+Datos/
 
 # Archivos temporales de Python
 __pycache__/
