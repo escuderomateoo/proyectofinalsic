@@ -5,10 +5,11 @@ import telebot
 from dotenv import load_dotenv
 from typing import Optional
 from apis.groq_api import get_groq_response, transcribe_voice_with_groq
+from apis.sentimiento import analizador_sentimiento
+from config import TELEGRAM_TOKEN
 
 load_dotenv()
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 if not TELEGRAM_TOKEN:
     raise ValueError("No se encuentra el Token de Telegram")
@@ -43,6 +44,17 @@ def welcome_message(message: telebot.types.Message):
     )
 
 
+@bot.message_handler(commands=["sentimiento"])
+def cmd_sentimiento(message):
+    texto = message.text
+    if len(texto.split(" ", 1)) < 2:
+        bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
+        return
+    frase = texto.split(" ", 1)[1].strip('"')
+    resultado = analizador_sentimiento(frase)
+    bot.reply_to(message, resultado)
+
+
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
     if not bank_data:
@@ -60,7 +72,7 @@ def handle_text_message(message: telebot.types.Message):
         bot.reply_to(
             message,
             "Lo siento, hubo un error al procesar tu consulta.\n"
-            "Podés escribirnos a info@codificardev.com.ar para más información.",
+            "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
 
 

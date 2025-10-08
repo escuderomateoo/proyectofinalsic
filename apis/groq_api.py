@@ -1,13 +1,19 @@
-import json
 import os
-from typing import Optional
+import json
 from groq import Groq
-import telebot
+from typing import Optional
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    raise ValueError("No se encuentra la API_KEY de Groq")
+
+groq_client = Groq(api_key=GROQ_API_KEY)
 
 
-def get_groq_response(
-    user_message: str, bank_data: dict, groq_client: Groq
-) -> Optional[str]:
+def get_groq_response(user_message: str, bank_data: dict) -> Optional[str]:
     try:
         system_prompt = f"""
 Eres un asistente que responde preguntas sobre bancos y sus tarifas mensuales en Argentina.
@@ -38,36 +44,24 @@ Dataset de referencia:
             temperature=0.2,
             max_tokens=500,
         )
-        return chat_completion.choices[0].message.content.strip()
 
+        return chat_completion.choices[0].message.content.strip()
     except Exception as e:
         print(f"Error al obtener la respuesta: {str(e)}")
         return None
 
 
-def transcribe_voice_with_groq(
-    bot: telebot.TeleBot, message: telebot.types.Message, groq_client: Groq
-) -> Optional[str]:
+def transcribe_voice_with_groq(file_path: str) -> Optional[str]:
     try:
-        file_info = bot.get_file(message.voice.file_id)
-        downloaded_file = bot.download_file(file_info.file_path)
-        temp_file = "temp_voice.ogg"
-
-        with open(temp_file, "wb") as f:
-            f.write(downloaded_file)
-
-        with open(temp_file, "rb") as file:
+        with open(file_path, "rb") as file:
             transcription = groq_client.audio.transcriptions.create(
-                file=(temp_file, file),
+                file=(file_path, file),
                 model="whisper-large-v3-turbo",
                 prompt="Consulta sobre bancos y tarifas",
                 response_format="json",
                 language="es",
             )
-
-        os.remove(temp_file)
         return transcription.text
-
     except Exception as e:
         print(f"Error al transcribir el audio: {str(e)}")
         return None
