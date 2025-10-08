@@ -13,8 +13,8 @@ Un bot de Telegram que responde preguntas usando una base de datos local y una A
 
 1. Cloná este repositorio o descargá los archivos.  
 2. Creá y activá un entorno virtual (recomendado):
-python -m venv venv
-venv\Scripts\activate      # Windows
+python -m venv entorno_bot
+entorno_bot\Scripts\activate      # Windows
 
 Instalá las dependencias:
 pip install -r requirements.txt
