@@ -94,7 +94,7 @@ def handle_voice_message(message: telebot.types.Message):
         bot.reply_to(
             message,
             "Ocurrió un error al procesar tu consulta.\n"
-            "Podés escribirnos a info@codificardev.com.ar para más información.",
+            "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
 
 

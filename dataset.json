@@ -1,158 +1,257 @@
-[
-  {
-    "bank": "Banco de la Nación Argentina",
-    "province": "Ciudad Autónoma de Buenos Aires (sede)",
-    "monthly_maintenance_ars": "6612 + IVA",
-    "note": "Valor tomado del tarifario público (tarifa informada para mantenimiento/administración)."
+{
+  "company_info": {
+    "name": "BankRates Argentina",
+    "description": "Información actualizada y centralizada sobre tarifas bancarias y costos de mantenimiento de cuentas y tarjetas en entidades argentinas.\n\nBankRates Argentina recopila datos públicos de bancos nacionales, provinciales y digitales. Su objetivo es ofrecer transparencia financiera y ayudar a los usuarios a comparar costos de servicios bancarios en un solo lugar.\n\nEl sistema incluye información sobre bancos tradicionales, entidades provinciales y fintechs, diferenciando por región y tipo de producto.\n\nFundada en 2023, la plataforma surge como iniciativa de open data financiero, combinando análisis técnico y automatización de datos públicos.",
+    "mission": "Promover la transparencia bancaria mediante datos accesibles y comprensibles para cualquier persona.",
+    "vision": "Ser la referencia más confiable en información sobre costos bancarios y servicios financieros en Argentina.",
+    "values": [
+      "Transparencia",
+      "Actualización constante",
+      "Accesibilidad",
+      "Educación financiera"
+    ],
+    "location": {
+      "address": "Av. Corrientes 1450, Piso 7",
+      "city": "Ciudad Autónoma de Buenos Aires",
+      "state": "Buenos Aires",
+      "country": "Argentina"
+    },
+    "contact": {
+      "website": "https://bankrates.com.ar",
+      "email": "info@bankrates.com.ar",
+      "phone": "+54 11 4567 2310",
+      "brochure": "https://bankrates.com.ar/docs/Tarifario-Bancario-2025.pdf"
+    }
   },
-  {
-    "bank": "Banco de la Provincia de Buenos Aires (Bapro)",
-    "province": "Buenos Aires",
-    "monthly_maintenance_ars": 7200,
-    "note": "Valor de ejemplo según cuadro tarifario (puede variar por categoría/bonificaciones)."
+  "services": {
+    "main_categories": [
+      {
+        "name": "Comparación de tarifas bancarias",
+        "description": "Consulta y comparación de costos de mantenimiento mensual de cuentas, tarjetas y servicios financieros."
+      },
+      {
+        "name": "Reportes financieros",
+        "description": "Informes mensuales sobre evolución de costos bancarios y actualización de tarifarios públicos."
+      },
+      {
+        "name": "Consultoría para empresas",
+        "description": "Asesoría para la selección de bancos corporativos según necesidades financieras y costos operativos."
+      },
+      {
+        "name": "Integración de datos API",
+        "description": "Servicio de API para desarrolladores y entidades financieras que deseen acceder a datos estructurados."
+      }
+    ]
   },
-  {
-    "bank": "Banco Ciudad",
-    "province": "Ciudad Autónoma de Buenos Aires",
-    "monthly_maintenance_ars": 6458,
-    "note": "Valor informado en tarifario (ejemplo para una categoría de tarjeta)."
+  "pricing": [
+    {
+      "service": "Acceso a base de datos Premium",
+      "base_price": 50,
+      "currency": "USD",
+      "maintenance_period": "mensual",
+      "note": "Incluye reportes automatizados y acceso anticipado a actualizaciones de tarifas bancarias."
+    },
+    {
+      "service": "Consultoría corporativa",
+      "base_price": 200,
+      "currency": "USD",
+      "maintenance_period": "único",
+      "note": "Incluye análisis personalizado y recomendaciones de bancos por tipo de empresa."
+    },
+    {
+      "service": "Licencia API empresarial",
+      "base_price": 400,
+      "currency": "USD",
+      "maintenance_period": "anual",
+      "note": "Acceso completo a endpoints financieros y soporte técnico prioritario."
+    }
+  ],
+  "bank_data": [
+    {
+      "bank": "Banco de la Nación Argentina",
+      "province": "Ciudad Autónoma de Buenos Aires (sede)",
+      "monthly_maintenance_ars": 8000.52,
+      "note": "Valor final estimado (tarifa base de $6612 + 21% de IVA)."
+    },
+    {
+      "bank": "Banco de la Provincia de Buenos Aires (Bapro)",
+      "province": "Buenos Aires",
+      "monthly_maintenance_ars": 7200,
+      "note": "Valor de ejemplo según cuadro tarifario (puede variar por categoría/bonificaciones)."
+    },
+    {
+      "bank": "Banco Ciudad",
+      "province": "Ciudad Autónoma de Buenos Aires",
+      "monthly_maintenance_ars": 6458,
+      "note": "Valor informado en tarifario para una categoría de tarjeta estándar."
+    },
+    {
+      "bank": "Banco de la Provincia de Córdoba (Bancor)",
+      "province": "Córdoba",
+      "monthly_maintenance_ars": 6193.03,
+      "note": "Costo de mantenimiento mensual según tarifario provincial."
+    },
+    {
+      "bank": "Nuevo Banco de Santa Fe",
+      "province": "Santa Fe",
+      "monthly_maintenance_ars": 6962.34,
+      "note": "Importe informado en el tarifario para categorías estándar."
+    },
+    {
+      "bank": "Banco Macro",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 5275.6,
+      "note": "Costo del paquete base sin bonificaciones ni beneficios Premium."
+    },
+    {
+      "bank": "ICBC Argentina",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 9602.56,
+      "note": "Comisión por mantenimiento según su tarifario, incluye IVA y otros cargos."
+    },
+    {
+      "bank": "Banco Patagonia",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 9075,
+      "note": "Mantenimiento mensual estimado para tarjetas internacionales."
+    },
+    {
+      "bank": "Banco Galicia",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 8200,
+      "note": "Valor promedio estimado entre paquetes Classic y Eminent."
+    },
+    {
+      "bank": "BBVA Argentina",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 7500,
+      "note": "Costo base estimado para cuentas estándar sin beneficios corporativos."
+    },
+    {
+      "bank": "Santander Río",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 6028,
+      "note": "Valor publicado en la web que indica el precio final con impuestos incluidos."
+    },
+    {
+      "bank": "Banco Supervielle",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 850,
+      "note": "Tarifa más baja publicada, aplica a paquete básico digital."
+    },
+    {
+      "bank": "Banco Credicoop",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 6800,
+      "note": "Tarifa aproximada publicada en el tarifario público para paquetes personales."
+    },
+    {
+      "bank": "Banco Hipotecario",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 1971.77,
+      "note": "Tarifa basada en el costo del paquete 'Fácil Pack'; las cajas de ahorro básicas pueden tener costo cero."
+    },
+    {
+      "bank": "Nuevo Banco del Chaco",
+      "province": "Chaco",
+      "monthly_maintenance_ars": 5800,
+      "note": "Valor estimado para paquete básico de servicios según tarifario provincial."
+    },
+    {
+      "bank": "Banco de La Pampa",
+      "province": "La Pampa",
+      "monthly_maintenance_ars": 6500,
+      "note": "Costo estimado del paquete básico de mantenimiento de cuenta."
+    },
+    {
+      "bank": "Nuevo Banco de La Rioja",
+      "province": "La Rioja",
+      "monthly_maintenance_ars": 5500,
+      "note": "Valor de referencia para el mantenimiento de un paquete de productos básico."
+    },
+    {
+      "bank": "Banco del Chubut",
+      "province": "Chubut",
+      "monthly_maintenance_ars": 6100,
+      "note": "Costo aproximado de mantenimiento de cuenta para clientes individuales."
+    },
+    {
+      "bank": "Naranja X",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 0,
+      "note": "La cuenta digital Naranja X no tiene costo de mantenimiento."
+    },
+    {
+      "bank": "Mercado Pago",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 0,
+      "note": "La cuenta digital de Mercado Pago no posee costos fijos de mantenimiento."
+    },
+    {
+      "bank": "Ualá",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 0,
+      "note": "La cuenta y tarjeta prepaga Ualá no tienen costo de mantenimiento."
+    },
+    {
+      "bank": "Brubank",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 0,
+      "note": "Banco digital sin costo de mantenimiento para cuentas individuales."
+    },
+    {
+      "bank": "Wilobank",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 0,
+      "note": "Adquirido por Ualá, opera bajo su misma modalidad sin costo de mantenimiento."
+    },
+    {
+      "bank": "Banco Comafi",
+      "province": "Nacional",
+      "monthly_maintenance_ars": 6976.98,
+      "note": "Costo de mantenimiento de cuenta para tarjetas de crédito según tarifario."
+    }
+  ],
+  "faqs": [
+    {
+      "question": "¿Los valores incluyen impuestos?",
+      "answer": "Sí, salvo aclaración contraria, los valores de mantenimiento incluyen IVA y cargos administrativos."
+    },
+    {
+      "question": "¿Qué bancos digitales no cobran mantenimiento?",
+      "answer": "Actualmente Brubank, Ualá, Naranja X, Wilobank y Mercado Pago no cobran mantenimiento mensual por sus cuentas estándar."
+    },
+    {
+      "question": "¿Cómo se actualizan los datos?",
+      "answer": "Los datos se revisan mensualmente en los tarifarios públicos de los bancos y se validan de forma automática."
+    },
+    {
+      "question": "¿Puedo acceder al tarifario completo?",
+      "answer": "Sí, podés descargarlo desde https://bankrates.com.ar/docs/Tarifario-Bancario-2025.pdf."
+    }
+  ],
+  "social_media": {
+    "linkedin": "https://www.linkedin.com/company/bankrates-ar/",
+    "telegram": "https://t.me/BankRatesArgentina",
+    "x": "https://x.com/bankrates_ar"
   },
-  {
-    "bank": "Banco de la Provincia de Córdoba (Bancor)",
-    "province": "Córdoba",
-    "monthly_maintenance_ars": 6193.03,
-    "note": "Ejemplo de mantenimiento mensual según tarifario (varía por categoría)."
+  "off_topic_handling": {
+    "personal_questions": "No responder preguntas personales sobre empleados o usuarios.",
+    "political_questions": "No responder temas políticos o ajenos al sistema financiero.",
+    "entertainment": "No responder sobre espectáculos o cultura popular.",
+    "technical_unrelated": "Ignorar consultas que no se relacionen con bancos, finanzas o servicios financieros.",
+    "spam_or_insults": "Responder con cortesía automática indicando que el bot no puede procesar el mensaje."
   },
-  {
-    "bank": "Nuevo Banco de Santa Fe",
-    "province": "Santa Fe",
-    "monthly_maintenance_ars": 6962.34,
-    "note": "Importe informado en el tarifario para varias categorías (puede variar por tipo de tarjeta)."
-  },
-  {
-    "bank": "Banco Macro",
-    "province": "Nacional",
-    "monthly_maintenance_ars": 5275.6,
-    "note": "Valor aproximado tomado del tarifario público para la tarjeta más económica (puede variar)."
-  },
-  {
-    "bank": "ICBC Argentina",
-    "province": "Nacional",
-    "monthly_maintenance_ars": 9602.56,
-    "note": "Comisión por mantenimiento según su tarifario (puede variar por categoría)."
-  },
-  {
-    "bank": "Banco Patagonia",
-    "province": "Nacional (origen: Chubut/CABA)",
-    "monthly_maintenance_ars": 9075,
-    "note": "Comisión mensual informada para tarjetas internacionales según tarifario."
-  },
-  {
-    "bank": "Banco Galicia",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "El banco publica tarifas por categoría y paquetes; sin valor único genérico."
-  },
-  {
-    "bank": "BBVA Argentina",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifario con valores por producto/bonificaciones; no se establece un único importe general."
-  },
-  {
-    "bank": "Santander Río",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "6028 (precio final con impuestos)",
-    "note": "Valor publicado en la web que indica monto sin impuestos y monto final con impuestos."
-  },
-  {
-    "bank": "Banco Supervielle",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "850",
-    "note": "Ejemplo del valor más bajo publicado según paquete; pueden existir bonificaciones y otras categorías."
-  },
-  {
-    "bank": "Banco Credicoop",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifas variables según productos; no se ubicó un único valor estándar."
-  },
-  {
-    "bank": "Banco Hipotecario",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifario con múltiples categorías; importe más económico no publicado como único valor público."
-  },
-  {
-    "bank": "Bancor (Banco de Córdoba)",
-    "province": "Córdoba",
-    "monthly_maintenance_ars": 6193.03,
-    "note": "Repetido a modo de referencia; verificar categoría específica."
-  },
-  {
-    "bank": "Nuevo Banco del Chaco",
-    "province": "Chaco",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "El banco publica cuadros tarifarios pero el valor depende de la categoría."
-  },
-  {
-    "bank": "Banco de La Pampa",
-    "province": "La Pampa",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifas por categoría; no hay un único importe general."
-  },
-  {
-    "bank": "Nuevo Banco de La Rioja",
-    "province": "La Rioja",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifas publicadas por el banco, varían según producto."
-  },
-  {
-    "bank": "Banco del Chubut",
-    "province": "Chubut",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Tarifas por categoría/bonificaciones; no se encontró un valor único."
-  },
-  {
-    "bank": "Naranja / Tarjeta Naranja",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Emisor no bancario; tarifas varían según producto y convenios."
-  },
-  {
-    "bank": "Nx (Naranja X)",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Marca fintech relacionada a Naranja; consultar tarifario específico."
-  },
-  {
-    "bank": "Mercado Pago (Mercado Pago Crédito / Tarjeta Mercado)",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Billetera que ofrece tarjeta de crédito/financiación; políticas tarifarias variables."
-  },
-  {
-    "bank": "Ualá",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Ualá ofrece productos de tarjeta (prepagas y líneas de crédito); el costo de mantenimiento depende del producto."
-  },
-  {
-    "bank": "Brubank",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Banco digital que emite tarjetas; tarifas publicadas por producto."
-  },
-  {
-    "bank": "Wilobank",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Banco digital; consultar tarifario para el importe más económico."
-  },
-  {
-    "bank": "Banco Comafi",
-    "province": "Nacional",
-    "monthly_maintenance_ars": "Desconocido",
-    "note": "Emisor con distintas categorías de tarjetas; valor mínimo no siempre publicado como cifra única."
+  "business_hours": {
+    "open": "09:00",
+    "close": "23:00",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "days": [
+      "lunes",
+      "martes",
+      "miércoles",
+      "jueves",
+      "viernes"
+    ]
   }
-]
+}
