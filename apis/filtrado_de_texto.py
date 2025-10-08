@@ -39,7 +39,7 @@ def limpiar_texto(texto:str)->str:
     texto = re.sub(r'\s+',' ',texto).strip()#Elimina espacios iniciales y finales, y luego corrige
                                             #que no hayan espacios seguidos, es decir si se cumple:
                                             # \s+, ie, dos espacios seguidos, pone un solo espacio.
-    texto = re.sub(r'(.)\1+',r'\1',texto)   #Elimina letras repetidas
+    #texto = re.sub(r'(.)\1+',r'\1',texto)   #Elimina letras repetidas
     texto_arreglado = texto
 
     return texto_arreglado

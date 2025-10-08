@@ -1,25 +1,158 @@
 [
   {
-      "pregunta": "hola",
-      "respuesta": "¡Hola! ¿En qué puedo ayudarte?"
+    "bank": "Banco de la Nación Argentina",
+    "province": "Ciudad Autónoma de Buenos Aires (sede)",
+    "monthly_maintenance_ars": "6612 + IVA",
+    "note": "Valor tomado del tarifario público (tarifa informada para mantenimiento/administración)."
   },
   {
-      "pregunta": "como estás",
-      "respuesta": "Estoy bien, ¡gracias por preguntar!"
+    "bank": "Banco de la Provincia de Buenos Aires (Bapro)",
+    "province": "Buenos Aires",
+    "monthly_maintenance_ars": 7200,
+    "note": "Valor de ejemplo según cuadro tarifario (puede variar por categoría/bonificaciones)."
   },
   {
-      "pregunta": "que es la inteligencia artificial",
-      "respuesta": "La inteligencia artificial es una rama de la informática que se encarga de crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana."
+    "bank": "Banco Ciudad",
+    "province": "Ciudad Autónoma de Buenos Aires",
+    "monthly_maintenance_ars": 6458,
+    "note": "Valor informado en tarifario (ejemplo para una categoría de tarjeta)."
   },
   {
-      "pregunta": "quien es tu creador?",
-      "respuesta": "Soy un bot creado por Mateo Escudero en Samsung Innovation Campus."
+    "bank": "Banco de la Provincia de Córdoba (Bancor)",
+    "province": "Córdoba",
+    "monthly_maintenance_ars": 6193.03,
+    "note": "Ejemplo de mantenimiento mensual según tarifario (varía por categoría)."
   },
-  
   {
-    "pregunta": "entraste en la base de datos?",
-    "respuesta": "si capo obvio"
-    }
-
-
+    "bank": "Nuevo Banco de Santa Fe",
+    "province": "Santa Fe",
+    "monthly_maintenance_ars": 6962.34,
+    "note": "Importe informado en el tarifario para varias categorías (puede variar por tipo de tarjeta)."
+  },
+  {
+    "bank": "Banco Macro",
+    "province": "Nacional",
+    "monthly_maintenance_ars": 5275.6,
+    "note": "Valor aproximado tomado del tarifario público para la tarjeta más económica (puede variar)."
+  },
+  {
+    "bank": "ICBC Argentina",
+    "province": "Nacional",
+    "monthly_maintenance_ars": 9602.56,
+    "note": "Comisión por mantenimiento según su tarifario (puede variar por categoría)."
+  },
+  {
+    "bank": "Banco Patagonia",
+    "province": "Nacional (origen: Chubut/CABA)",
+    "monthly_maintenance_ars": 9075,
+    "note": "Comisión mensual informada para tarjetas internacionales según tarifario."
+  },
+  {
+    "bank": "Banco Galicia",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "El banco publica tarifas por categoría y paquetes; sin valor único genérico."
+  },
+  {
+    "bank": "BBVA Argentina",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifario con valores por producto/bonificaciones; no se establece un único importe general."
+  },
+  {
+    "bank": "Santander Río",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "6028 (precio final con impuestos)",
+    "note": "Valor publicado en la web que indica monto sin impuestos y monto final con impuestos."
+  },
+  {
+    "bank": "Banco Supervielle",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "850",
+    "note": "Ejemplo del valor más bajo publicado según paquete; pueden existir bonificaciones y otras categorías."
+  },
+  {
+    "bank": "Banco Credicoop",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifas variables según productos; no se ubicó un único valor estándar."
+  },
+  {
+    "bank": "Banco Hipotecario",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifario con múltiples categorías; importe más económico no publicado como único valor público."
+  },
+  {
+    "bank": "Bancor (Banco de Córdoba)",
+    "province": "Córdoba",
+    "monthly_maintenance_ars": 6193.03,
+    "note": "Repetido a modo de referencia; verificar categoría específica."
+  },
+  {
+    "bank": "Nuevo Banco del Chaco",
+    "province": "Chaco",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "El banco publica cuadros tarifarios pero el valor depende de la categoría."
+  },
+  {
+    "bank": "Banco de La Pampa",
+    "province": "La Pampa",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifas por categoría; no hay un único importe general."
+  },
+  {
+    "bank": "Nuevo Banco de La Rioja",
+    "province": "La Rioja",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifas publicadas por el banco, varían según producto."
+  },
+  {
+    "bank": "Banco del Chubut",
+    "province": "Chubut",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Tarifas por categoría/bonificaciones; no se encontró un valor único."
+  },
+  {
+    "bank": "Naranja / Tarjeta Naranja",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Emisor no bancario; tarifas varían según producto y convenios."
+  },
+  {
+    "bank": "Nx (Naranja X)",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Marca fintech relacionada a Naranja; consultar tarifario específico."
+  },
+  {
+    "bank": "Mercado Pago (Mercado Pago Crédito / Tarjeta Mercado)",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Billetera que ofrece tarjeta de crédito/financiación; políticas tarifarias variables."
+  },
+  {
+    "bank": "Ualá",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Ualá ofrece productos de tarjeta (prepagas y líneas de crédito); el costo de mantenimiento depende del producto."
+  },
+  {
+    "bank": "Brubank",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Banco digital que emite tarjetas; tarifas publicadas por producto."
+  },
+  {
+    "bank": "Wilobank",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Banco digital; consultar tarifario para el importe más económico."
+  },
+  {
+    "bank": "Banco Comafi",
+    "province": "Nacional",
+    "monthly_maintenance_ars": "Desconocido",
+    "note": "Emisor con distintas categorías de tarjetas; valor mínimo no siempre publicado como cifra única."
+  }
 ]
