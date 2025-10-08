@@ -4,17 +4,17 @@ Un bot de Telegram que responde preguntas usando una base de datos local y una A
 
 ## Requisitos
 
-- Python 3.7 o superior  
-- [Telegram Bot Token](https://core.telegram.org/bots#6-botfather)  
-- Clave API de Groq  
-- Archivo `dataset.json` con preguntas y respuestas 
+- Python 3.7 o superior
+- [Telegram Bot Token](https://core.telegram.org/bots#6-botfather)
+- Clave API de Groq
+- Archivo `dataset.json` con preguntas y respuestas
 
 ## Instalación
 
-1. Cloná este repositorio o descargá los archivos.  
+1. Cloná este repositorio o descargá los archivos.
 2. Creá y activá un entorno virtual (recomendado):
-python -m venv entorno_bot
-entorno_bot\Scripts\activate      # Windows
+   python -m venv entorno_bot
+   entorno_bot\Scripts\activate # Windows
 
 Instalá las dependencias:
 pip install -r requirements.txt
@@ -36,7 +36,10 @@ Si no, consulta a la IA vía API Groq.
 
 Usá /sentimiento "frase" para analizar el sentimiento de cualquier texto.
 
-Este proyecto fue desarrollado en el marco del **Samsung Innovation Campus**.  
+Este proyecto fue desarrollado en el marco del **Samsung Innovation Campus**, Los integrantes del grupo son:
+"Escudero Mateo"
+""
+"" (pongan sus nombres ).  
 Un agradecimiento especial al profesor **Ale Sosa** por su guía y apoyo durante el desarrollo.
 
 ---
