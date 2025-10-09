@@ -22,13 +22,20 @@ bank_data = load_bank_data()
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
-
+    markup = telebot.types.InlineKeyboardMarkup()
+    markup.row_width = 2
+    for preguntas in bank_data['faqs']:
+        markup.add(
+            telebot.types.InlineKeyboardButton(
+                preguntas['question'], callback_data=preguntas['question'])
+            )
     bot.reply_to(
         message,
         "💰 ¡Hola! Soy el bot informativo sobre bancos en Argentina.\n"
         "Podés consultarme tarifas, costos de mantenimiento o comparar entidades.",
     )
-
+    bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
+    
 @bot.message_handler(commands=["sentimiento"])
 def cmd_sentimiento(message):
     texto = message.text
@@ -92,7 +99,6 @@ def handle_voice_message(message: telebot.types.Message):
             "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
 
-
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
@@ -109,6 +115,13 @@ def handle_foto(message):
     
     except Exception as e:
         bot.reply_to(message, f"Error al procesar la imagen: {str(e)}")
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    if call.data:
+        respuesta = get_groq_response(filtrar_texto(call.text), bank_data)
+    bot.send_chat_action(call.message.chat.id, "typing")
+    bot.send_message(call.message.chat.id, respuesta)
 
 if __name__ == "__main__":
     if bank_data:
