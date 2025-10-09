@@ -118,8 +118,8 @@ def handle_foto(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
-    if call.data:
-        respuesta = get_groq_response(filtrar_texto(call.text), bank_data)
+    call.text = call.data
+    respuesta = get_groq_response(filtrar_texto(call.text), bank_data)
     bot.send_chat_action(call.message.chat.id, "typing")
     bot.send_message(call.message.chat.id, respuesta)
 
