@@ -24,6 +24,7 @@ TELEGRAM_TOKEN=tu_token_de_telegram_aquí
 GROQ_API_KEY=tu_clave_api_de_groq_aquí
 
 Asegurate de tener el archivo dataset.json con preguntas y respuestas en la raíz.
+## Uso Del Bot
 
 Uso
 Ejecutá el bot con:
@@ -35,6 +36,10 @@ Cualquier consulta es respondida por Groq usando la base de datos dada.
 
 Usá /sentimiento "frase" para analizar el sentimiento de cualquier texto.
 
+## IMPORTANTE
+Una vez activado el bot, los comandos de la terminal dejan de funcionar.
+
+# Presentacion
 Este proyecto fue desarrollado en el marco del **Samsung Innovation Campus**, Los integrantes del grupo son:
 "Escudero Mateo"
 "Damián Melgarejo"
