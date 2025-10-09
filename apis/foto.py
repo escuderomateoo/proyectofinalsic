@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 from groq import Groq
 from apis.groq_api import system_prompt
 
-
 # Cargar variables del entorno
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
