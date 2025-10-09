@@ -1,5 +1,4 @@
 import os
-import json
 import time
 import telebot
 from apis.filtrado_de_texto import filtrar_texto
