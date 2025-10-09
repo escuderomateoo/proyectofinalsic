@@ -62,4 +62,20 @@ def eliminar_stopwords(texto:str)->str:
     texto_corregido = ' '.join(filtrado)
     return texto_corregido
 
+def filtrar_texto(texto:str)->str:
+    """
+    Funcion que aplica las funciones de limpieza y eliminacion de stopwords
+    a una linea de texto.
+
+    Args:
+        texto(str): Linea de texto en formato str
+
+    Returns:
+        texto_arreglado(str):   linea de texto en formato str limpia y sin stopwords
+    """
+    texto_limpio = limpiar_texto(texto)
+    texto_filtrado = eliminar_stopwords(texto_limpio)
+    return texto_filtrado
+
+
 print(limpiar_texto(eliminar_stopwords("Holaaa!!! Esto es una prueba, para ver si accion llano llaga llueve el filtro de texto.")))
