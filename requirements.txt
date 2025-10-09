@@ -1,13 +1,6 @@
-<<<<<<< Updated upstream
-
 # Python 3.11.9
-
 nltk==3.9.1
 telebot==0.0.5    # reemplaza telebot==0.0.5 → es el paquete oficial
-=======
-annotated-types==0.7.0
-anyio==4.11.0
->>>>>>> Stashed changes
 certifi==2025.7.14
 charset-normalizer==3.4.2
 click==8.3.0
@@ -50,8 +43,5 @@ transformers==4.45.2
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.2.3
-<<<<<<< Updated upstream
 python-dotenv==1.0.1
 groq==0.32.0
-=======
->>>>>>> Stashed changes

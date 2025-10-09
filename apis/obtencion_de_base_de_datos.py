@@ -1,5 +1,6 @@
 import json
 
+
 def load_bank_data():
     try:
         with open("dataset.json", "r", encoding="utf-8") as f:
