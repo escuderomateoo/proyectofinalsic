@@ -68,11 +68,11 @@ def transcribe_voice_with_groq(file_path: str) -> Optional[str]:
             transcription = groq_client.audio.transcriptions.create(
                 file=(file_path, file),
                 model="whisper-large-v3-turbo",
-                prompt='Eres un asistente que responde preguntas sobre bancos y sus tarifas mensuales en Argentina.' \
-                'Usa la información del dataset para responder con precisión, claridad y contexto actualizado.' \
-                'Interpreta imágenes y audios para extraer texto y responder según las reglas.' \
-                'Dataset de referencia:' \
-                '{json.dumps(bank_data, ensure_ascii=False, indent=2)}',
+                prompt=f"""
+                Eres un asistente que responde preguntas sobre bancos y sus tarifas mensuales en Argentina.' \
+                Usa la información del dataset para responder con precisión, claridad y contexto actualizado.' \
+                Interpreta imágenes y audios para extraer texto y responder según las reglas.' \
+                """,
                 response_format="json",
                 language="es",
             )
