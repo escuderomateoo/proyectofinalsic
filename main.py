@@ -8,6 +8,7 @@ from typing import Optional
 from apis.groq_api import get_groq_response, transcribe_voice_with_groq
 from apis.sentimiento import analizador_sentimiento
 from config import TELEGRAM_TOKEN
+from apis.obtencion_de_base_de_datos import load_bank_data
 
 load_dotenv()
 
@@ -16,23 +17,11 @@ if not TELEGRAM_TOKEN:
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
-def load_bank_data():
-    try:
-        with open("dataset.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print("Error: No se encontró el archivo dataset.json")
-    except json.JSONDecodeError:
-        print("Error al leer dataset.json. Formato JSON incorrecto.")
-    return None
-
+#Traigo la base de datos
 bank_data = load_bank_data()
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
-    if not bank_data:
-        bot.reply_to(message, "Error cargando datos de los bancos.")
-        return
 
     bot.reply_to(
         message,
