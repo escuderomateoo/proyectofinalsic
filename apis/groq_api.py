@@ -12,10 +12,16 @@ if not GROQ_API_KEY:
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
+# Cargar dataset de bancos
+try :
+    with open("dataset.json", "r", encoding="utf-8") as f:
+        bank_data = json.load(f)
+except FileNotFoundError:
+    print("El archivo dataset.json no fue encontrado.")
+except json.JSONDecodeError:
+    print("Error al decodificar el archivo JSON.")
 
-def get_groq_response(user_message: str, bank_data: dict) -> Optional[str]:
-    try:
-        system_prompt = f"""
+system_prompt = f"""
 Eres un asistente que responde preguntas sobre bancos y sus tarifas mensuales en Argentina.
 Usa la información del dataset para responder con precisión, claridad y contexto actualizado.
 
@@ -36,6 +42,9 @@ Reglas:
 Dataset de referencia:
 {json.dumps(bank_data, ensure_ascii=False, indent=2)}
 """
+
+def get_groq_response(user_message: str, bank_data: dict) -> Optional[str]:
+    try:
         chat_completion = groq_client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -58,7 +67,7 @@ def transcribe_voice_with_groq(file_path: str) -> Optional[str]:
             transcription = groq_client.audio.transcriptions.create(
                 file=(file_path, file),
                 model="whisper-large-v3-turbo",
-                prompt="Consulta sobre bancos y tarifas",
+                prompt=system_prompt,
                 response_format="json",
                 language="es",
             )
