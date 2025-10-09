@@ -2,6 +2,7 @@ import os
 import json
 import time
 import telebot
+from apis.filtrado_de_texto import filtrar_texto
 from dotenv import load_dotenv
 from typing import Optional
 from apis.groq_api import get_groq_response, transcribe_voice_with_groq
@@ -10,12 +11,10 @@ from config import TELEGRAM_TOKEN
 
 load_dotenv()
 
-
 if not TELEGRAM_TOKEN:
     raise ValueError("No se encuentra el Token de Telegram")
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
-
 
 def load_bank_data():
     try:
@@ -27,9 +26,7 @@ def load_bank_data():
         print("Error al leer dataset.json. Formato JSON incorrecto.")
     return None
 
-
 bank_data = load_bank_data()
-
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
@@ -43,7 +40,6 @@ def welcome_message(message: telebot.types.Message):
         "Podés consultarme tarifas, costos de mantenimiento o comparar entidades.",
     )
 
-
 @bot.message_handler(commands=["sentimiento"])
 def cmd_sentimiento(message):
     texto = message.text
@@ -54,7 +50,6 @@ def cmd_sentimiento(message):
     resultado = analizador_sentimiento(frase)
     bot.reply_to(message, resultado)
 
-
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
     if not bank_data:
@@ -64,7 +59,7 @@ def handle_text_message(message: telebot.types.Message):
         return
 
     bot.send_chat_action(message.chat.id, "typing")
-    response = get_groq_response(message.text, bank_data)
+    response = get_groq_response(filtrar_texto(message.text), bank_data)
 
     if response:
         bot.reply_to(message, response)
@@ -74,7 +69,6 @@ def handle_text_message(message: telebot.types.Message):
             "Lo siento, hubo un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
-
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -91,7 +85,7 @@ def handle_voice_message(message: telebot.types.Message):
     with open(temp_file, "wb") as f:
         f.write(downloaded_file)
 
-    transcription = transcribe_voice_with_groq(temp_file)
+    transcription = filtrar_texto(transcribe_voice_with_groq(temp_file))
     os.remove(temp_file)
 
     if not transcription:
@@ -108,7 +102,6 @@ def handle_voice_message(message: telebot.types.Message):
             "Ocurrió un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
-
 
 if __name__ == "__main__":
     if bank_data:
