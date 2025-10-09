@@ -280,7 +280,15 @@
     "political_questions": "No responder temas políticos o ajenos al sistema financiero.",
     "entertainment": "No responder sobre espectáculos o cultura popular.",
     "technical_unrelated": "Ignorar consultas que no se relacionen con bancos, finanzas o servicios financieros.",
-    "spam_or_insults": "Responder con cortesía automática indicando que el bot no puede procesar el mensaje."
+    "spam_or_insults": "Responder con cortesía automática indicando que el bot no puede procesar el mensaje.",
+    "legal_advice": "Indicar que el bot no está autorizado para brindar asesoramiento legal específico.",
+    "health_medical": "No responder sobre temas de salud o medicina.",
+    "religion": "No responder sobre temas religiosos o creencias personales.",
+    "hacking_cybersecurity": "No responder sobre hacking, seguridad informática o actividades ilegales.",
+    "gambling": "No responder sobre juegos de azar o apuestas.",
+    "adult_content": "No responder sobre contenido para adultos o inapropiado.",
+    "gambling_betting": "No proporcionar consejos, pronósticos, estrategias o información sobre apuestas deportivas, lotería, casinos o cualquier tipo de juego de azar.",
+    "other_irrelevant": "Ignorar consultas que no se relacionen con el propósito del sistema."
   },
   "business_hours": {
     "open": "09:00",
