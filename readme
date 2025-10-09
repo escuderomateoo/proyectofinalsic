@@ -32,9 +32,16 @@ python main.py
 Luego, en Telegram, buscá tu bot y enviá:
 /start o /help para iniciar la conversación.
 
-Cualquier consulta es respondida por Groq usando la base de datos dada.
+## FUNCIONALIDADES
 
-Usá /sentimiento "frase" para analizar el sentimiento de cualquier texto.
+- Cualquier consulta es respondida por Groq usando la base de datos dada.
+
+- Usá /sentimiento "frase" para analizar el sentimiento de cualquier texto.
+
+- Envía una imágen, el bot la analiza y te envia una descripción detallada.
+
+- El bot aplica un proceso de filtrado de texto a cada consulta de usuario antes de enviarla al modelo de lenguaje o de buscar en el dataset.
+
 
 ## IMPORTANTE
 Una vez activado el bot, los comandos de la terminal dejan de funcionar.
