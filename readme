@@ -1,15 +1,14 @@
-# Mi Proyecto El Bot
+🤖 Asistente de Bancos en Telegram
+Asistente conversacional para Telegram, impulsado por Groq, este bot esta diseñado para responder consultas bancarias en español mediante una base de datos local y realizar análisis de sentimiento, entre otras cosas que se detallan a continuación.
 
-Un bot de Telegram que responde preguntas usando una base de datos local y una API de inteligencia artificial. Además, puede analizar el sentimiento de frases en español.
+Requisitos del Sistema
 
-## Requisitos
+-Python 3.10 o superior
+-Telegram Bot Token (Obtenido de BotFather)
+-Clave API de Groq
+-Archivo dataset.json con la información estructurada.
 
-- Python 3.10 o superior
-- [Telegram Bot Token](https://core.telegram.org/bots#6-botfather)
-- Clave API de Groq
-- Archivo `dataset.json` con preguntas y respuestas
-
-## Instalación
+🛠️ Instalación y Configuración
 
 1. Cloná este repositorio o descargá los archivos.
 2. Creá y activá un entorno virtual (recomendado):
@@ -24,33 +23,40 @@ TELEGRAM_TOKEN=tu_token_de_telegram_aquí
 GROQ_API_KEY=tu_clave_api_de_groq_aquí
 
 Asegurate de tener el archivo dataset.json con preguntas y respuestas en la raíz.
-## Uso Del Bot
 
-Uso
+
+🚀 Uso del Bot
+
 Ejecutá el bot con:
 python main.py
 Luego, en Telegram, buscá tu bot y enviá:
 /start o /help para iniciar la conversación.
 
-## FUNCIONALIDADES
 
-- Cualquier consulta es respondida por Groq usando la base de datos dada.
+✨ Funcionalidades Destacadas
 
-- Usá /sentimiento "frase" para analizar el sentimiento de cualquier texto.
+-Respuesta Asistida por IA: Cualquier consulta es procesada por el modelo de Groq, que utiliza el contenido de dataset.json como contexto para dar respuestas precisas y conversacionales.
 
-- Envía una imágen, el bot la analiza y te envia una descripción detallada.
+-Análisis de Sentimiento: Usá el comando /sentimiento "frase" para obtener una clasificación del tono emocional del texto.
 
-- El bot aplica un proceso de filtrado de texto a cada consulta de usuario antes de enviarla al modelo de lenguaje o de buscar en el dataset.
+-Descripción de imagenes: Envía una imagen, y el bot la analizará para generar una descripción detallada de su contenido.
+
+-Filtro de Texto Inteligente: El bot aplica un proceso de limpieza (elimina acentos, puntuación y stopwords) a la consulta para optimizar la búsqueda de datos, la velocidad de respuesta de la IA y disminuir porcentaje de errores.
 
 
-## IMPORTANTE
+⚠️ IMPORTANTE
+
 Una vez activado el bot, los comandos de la terminal dejan de funcionar.
 
-# Presentacion
-Este proyecto fue desarrollado en el marco del **Samsung Innovation Campus**, Los integrantes del grupo son:
-"Escudero Mateo"
-"Damián Melgarejo"
-"Agustín Stella".  
-Un agradecimiento especial al profesor **Ale Sosa** por su guía y apoyo durante el desarrollo.
+👨‍💻 Desarrolladores y Agradecimientos
+Este proyecto fue desarrollado gracias a los conocimientos adquiridos en Samsung Innovation Campus.
 
----
+Integrantes del grupo:
+
+-Escudero Mateo
+-Damián Melgarejo
+-Agustín Stella
+
+Un agradecimiento especial al profesor Ale Sosa por su guía y apoyo durante el desarrollo y a los responsables del Programa Samusung Innovation por darnos esta oportunidad.
+
+
