@@ -21,6 +21,7 @@ bot = telebot.TeleBot(TELEGRAM_TOKEN)
 # Traigo la base de datos
 bank_data = load_bank_data()
 
+
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
     markup = telebot.types.InlineKeyboardMarkup()
@@ -38,6 +39,7 @@ def welcome_message(message: telebot.types.Message):
     )
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
+
 @bot.message_handler(commands=["sentimiento"])
 def cmd_sentimiento(message):
     texto = message.text
@@ -47,6 +49,7 @@ def cmd_sentimiento(message):
     frase = texto.split(" ", 1)[1].strip('"')
     resultado = analizador_sentimiento(frase)
     bot.reply_to(message, resultado)
+
 
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
@@ -67,6 +70,7 @@ def handle_text_message(message: telebot.types.Message):
             "Lo siento, hubo un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
+
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -101,6 +105,7 @@ def handle_voice_message(message: telebot.types.Message):
             "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
 
+
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
@@ -122,12 +127,14 @@ def handle_foto(message):
     except Exception as e:
         bot.reply_to(message, f"Error al procesar la imagen: {str(e)}")
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     call.text = call.data
     respuesta = get_groq_response(filtrar_texto(call.text), bank_data)
     bot.send_chat_action(call.message.chat.id, "typing")
     bot.send_message(call.message.chat.id, respuesta)
+
 
 if __name__ == "__main__":
     if bank_data:
