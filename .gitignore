@@ -1,6 +1,9 @@
 # Ignorar el entorno virtual
 /entorno_bot
 /.venv
+/entorno
+/venv
+/bot_entorno
 # Ignorar datos locales
 Datos/
 
