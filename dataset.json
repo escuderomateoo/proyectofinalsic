@@ -228,6 +228,46 @@
     {
       "question": "¿Puedo acceder al tarifario completo?",
       "answer": "Sí, podés descargarlo desde https://bankrates.com.ar/docs/Tarifario-Bancario-2025.pdf."
+    },
+    {
+      "question": "¿Cómo se calculan los costos de mantenimiento?",
+      "answer": "Los valores se obtienen de los tarifarios oficiales de cada banco. En algunos casos se estiman promedios entre distintos tipos de cuenta o tarjeta, siempre con base pública verificable."
+    },
+    {
+      "question": "¿Por qué varía el costo entre provincias?",
+      "answer": "Algunos bancos provinciales o regionales aplican tarifas diferentes por políticas locales o convenios con gobiernos provinciales."
+    },
+    {
+      "question": "¿Qué significa 'Desconocido' en los datos?",
+      "answer": "Significa que el banco no publica de forma clara un valor único para el mantenimiento mensual o que la tarifa depende de la categoría de cliente."
+    },
+    {
+      "question": "¿Incluyen tarjetas fintech como Naranja X o Ualá?",
+      "answer": "Sí, el sistema incluye bancos digitales y billeteras con servicios de tarjeta de crédito o débito, siempre que tengan operaciones activas en Argentina."
+    },
+    {
+      "question": "¿Los valores se actualizan automáticamente?",
+      "answer": "Sí, las actualizaciones se hacen de forma automática y se validan manualmente una vez al mes para asegurar la precisión de los datos."
+    },
+    {
+      "question": "¿Puedo comparar bancos por provincia?",
+      "answer": "Sí, podés filtrar los resultados por provincia o tipo de entidad (nacional, provincial o digital)."
+    },
+    {
+      "question": "¿Puedo descargar los datos?",
+      "answer": "Sí, podés descargar la base completa en formato CSV o JSON desde la sección de reportes o vía la API para desarrolladores."
+    },
+    {
+      "question": "¿Cómo funciona la API de BankRates?",
+      "answer": "La API permite acceder a los datos estructurados sobre costos bancarios y comparaciones, ideal para desarrolladores y analistas financieros."
+    },
+    {
+      "question": "¿Qué pasa si un banco cambia su tarifario?",
+      "answer": "El sistema detecta automáticamente los cambios y actualiza los valores en la próxima revisión mensual. Se notifica en los reportes si hubo modificaciones relevantes."
+    },
+    {
+      "question": "¿BankRates tiene relación con los bancos?",
+      "answer": "No, BankRates Argentina es un proyecto independiente de recopilación de datos públicos. No mantiene vínculos comerciales con las entidades listadas."
     }
   ],
   "social_media": {

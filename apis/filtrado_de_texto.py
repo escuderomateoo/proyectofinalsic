@@ -76,6 +76,3 @@ def filtrar_texto(texto:str)->str:
     texto_limpio = limpiar_texto(texto)
     texto_filtrado = eliminar_stopwords(texto_limpio)
     return texto_filtrado
-
-
-print(limpiar_texto(eliminar_stopwords("Holaaa!!! Esto es una prueba, para ver si accion llano llaga llueve el filtro de texto.")))
