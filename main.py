@@ -8,6 +8,7 @@ from apis.groq_api import get_groq_response, transcribe_voice_with_groq
 from apis.sentimiento import analizador_sentimiento
 from apis.config import TELEGRAM_TOKEN
 from apis.obtencion_de_base_de_datos import load_bank_data
+from apis.foto import describir_imagen
 
 load_dotenv()
 
@@ -90,6 +91,24 @@ def handle_voice_message(message: telebot.types.Message):
             "Ocurrió un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
+
+
+@bot.message_handler(content_types=["photo"])
+def handle_foto(message):
+    try:
+        #obtener foto con la mayor resolucion
+        file_id = message.photo[-1].file_id
+        file_info = bot.get_file(file_id)
+        file_url = f"https://api.telegram.org/file/bot{TELEGRAM_TOKEN}/{file_info.file_path}"
+        
+        bot.reply_to(message, "Analizando la imagen, en segundos te envio la descripción!")
+
+        #llamo a la funcion que describe la imagen
+        descripcion = describir_imagen(file_url)
+        bot.reply_to(message, f"Descripción:\n\n{descripcion}")
+    
+    except Exception as e:
+        bot.reply_to(message, f"Error al procesar la imagen: {str(e)}")
 
 if __name__ == "__main__":
     if bank_data:
