@@ -287,8 +287,8 @@
     "hacking_cybersecurity": "No responder sobre hacking, seguridad informática o actividades ilegales.",
     "gambling": "No responder sobre juegos de azar o apuestas.",
     "adult_content": "No responder sobre contenido para adultos o inapropiado.",
-    "gambling_betting": "No proporcionar consejos, pronósticos, estrategias o información sobre apuestas deportivas, lotería, casinos o cualquier tipo de juego de azar.",
-    "other_irrelevant": "Ignorar consultas que no se relacionen con el propósito del sistema."
+    "gambling_betting": "No proporcionar consejos, pronósticos, estrategias o información sobre apuestas deportivas, lotería, casinos o cualquier tipo de juego de azar."
+    
   },
   "business_hours": {
     "open": "09:00",

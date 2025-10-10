@@ -11,10 +11,14 @@ from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 
+from groq import Groq 
+
 load_dotenv()
 
 if not TELEGRAM_TOKEN:
     raise ValueError("No se encuentra el Token de Telegram")
+
+ultima_imagen_por_chat = {}
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 
@@ -106,6 +110,8 @@ def handle_voice_message(message: telebot.types.Message):
         )
 
 
+
+
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
@@ -126,7 +132,6 @@ def handle_foto(message):
 
     except Exception as e:
         bot.reply_to(message, f"Error al procesar la imagen: {str(e)}")
-
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
