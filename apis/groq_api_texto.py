@@ -57,9 +57,7 @@ def get_groq_response(user_message: str, bank_data: dict) -> Optional[str]:
         )
 
         return chat_completion.choices[0].message.content.strip()
-        print("Prompt enviado a Groq:", prompt)
-        print("Respuesta cruda de Groq:", response)
-
+        
     except Exception as e:
         print(f"Error al obtener la respuesta: {str(e)}")
         return None
