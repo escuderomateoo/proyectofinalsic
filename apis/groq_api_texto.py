@@ -11,7 +11,7 @@ if not GROQ_API_KEY:
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# 🔹 Definí system_prompt a nivel global
+# definí system_prompt a nivel global
 system_prompt = """
 Actua como un empleado de la empresa "Bank Ranks Arg" que responde preguntas sobre bancos y sus tarifas mensuales en Argentina.
 Usa la información del dataset para responder con precisión, claridad y contexto actualizado. 
@@ -34,6 +34,10 @@ Reglas:
 - Al interpretar una imagen o audio, extraé el texto y responde de forma detallada.
 - Si el usuario pregunta por los dueños, creadores o administradores, respondé educadamente: "Agustin Stella, Escudero Mateo y Damian Melgarejo".
 - No responder sobre temas fuera del ámbito bancario, financiero o de las imágenes/audio proporcionados.
+- Podés responder preguntas sobre imágenes o audios que el usuario te haya enviado, aunque no sean temas bancarios a excepcion de imagenes para adultos, o imagenes ilegales.
+- Si el usuario hace una pregunta que se refiere a una imagen reciente (por ejemplo, sobre colores, objetos, animales o lugares), respondé con base en la descripción de esa imagen.
+- Si no hay imagen previa o el mensaje no tiene relación con ella, respondé solo sobre temas bancarios o financieros.
+
 
 """
 
@@ -53,6 +57,9 @@ def get_groq_response(user_message: str, bank_data: dict) -> Optional[str]:
         )
 
         return chat_completion.choices[0].message.content.strip()
+        print("Prompt enviado a Groq:", prompt)
+        print("Respuesta cruda de Groq:", response)
+
     except Exception as e:
         print(f"Error al obtener la respuesta: {str(e)}")
         return None
