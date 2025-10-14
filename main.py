@@ -10,6 +10,8 @@ from config import TELEGRAM_TOKEN
 from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
+from apis.groq_api_csv import guardar_comprobante_csv
+import json
 
 from groq import Groq 
 
@@ -138,12 +140,8 @@ def handle_voice_message(message: telebot.types.Message):
 
 
 
-
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
-
-    
-
     try:
         # obtener foto con la mayor resolucion
         file_id = message.photo[-1].file_id
@@ -152,17 +150,60 @@ def handle_foto(message):
             f"https://api.telegram.org/file/bot{TELEGRAM_TOKEN}/{file_info.file_path}"
         )
 
-        bot.reply_to(
-            message, "Analizando la imagen, en segundos te envio la descripción!"
-        )
+        bot.reply_to(message, "🧠 Analizando la imagen...")
 
-        # llamo a la funcion que describe la imagen
+        # llamo a la función que describe la imagen
         descripcion = describir_imagen(file_url)
         ultima_imagen_por_chat[message.chat.id] = descripcion
-        bot.reply_to(message, f"Descripción:\n\n{descripcion}")
+
+        # si detecta que es un comprobante o transferencia, hace la extracción directa
+        if any(palabra in descripcion.lower() for palabra in ["comprobante", "transferencia", "pago"]):
+            bot.reply_to(message, "📄 Es un comprobante. Extrayendo los datos...")
+
+            prompt = (
+                f"Extrae los datos del comprobante mostrado en la siguiente descripción de imagen.\n\n"
+                f"{descripcion}\n\n"
+                f"Devolvé la información SOLO en formato JSON puro con el siguiente formato exacto:\n\n"
+                f"{{\n"
+                f'  "Monto": "valor",\n'
+                f'  "Fecha y hora": "valor",\n'
+                f'  "Número de operación": "valor",\n'
+                f'  "Nombre, CUIT/CUIL y CVU del remitente": "valor",\n'
+                f'  "Nombre, CUIT/CUIL y CVU del destinatario": "valor"\n'
+                f"}}\n\n"
+                f"No incluyas explicaciones ni texto adicional, solo el JSON."
+            )
+
+            respuesta_groq = get_groq_response(prompt, bank_data)
+
+            try:
+                comprobante_data = json.loads(respuesta_groq)
+                guardar_comprobante_csv(comprobante_data)
+
+                resumen = (
+                    "📄 *Resumen de la transferencia* 🤑\n"
+                    f"*Monto:* {comprobante_data.get('Monto')}\n"
+                    f"*Fecha y hora:* {comprobante_data.get('Fecha y hora')}\n"
+                    f"*Número de operación:* {comprobante_data.get('Número de operación')}\n\n"
+                    "*Información del remitente* 👉\n"
+                    f"{comprobante_data.get('Nombre, CUIT/CUIL y CVU del remitente')}\n\n"
+                    "*Información del destinatario* 💼\n"
+                    f"{comprobante_data.get('Nombre, CUIT/CUIL y CVU del destinatario')}"
+                )
+
+                bot.send_message(message.chat.id, resumen, parse_mode="Markdown")
+
+            except json.JSONDecodeError:
+                bot.reply_to(message, "⚠️ No pude interpretar los datos del comprobante como JSON válido.")
+                print("Respuesta Groq:", respuesta_groq)
+
+        else:
+            # si no es comprobante, solo describe la imagen normalmente
+            bot.reply_to(message, f"🖼️ Descripción:\n\n{descripcion}")
 
     except Exception as e:
-        bot.reply_to(message, f"Error al procesar la imagen: {str(e)}")
+        bot.reply_to(message, f"❌ Error al procesar la imagen: {str(e)}")
+
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
