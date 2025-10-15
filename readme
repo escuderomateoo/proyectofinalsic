@@ -41,6 +41,8 @@ Luego, en Telegram, buscá tu bot y enviá:
 
 -Descripción de imagenes: Envía una imagen, y el bot la analizará para generar una descripción detallada de su contenido.
 
+-Comprobantes: Envía un comprobante de transferencia, y el bot te enviará un resumen de la transferencia y guardará los datos en un archivo .CSV
+
 -Filtro de Texto Inteligente: El bot aplica un proceso de limpieza (elimina acentos, puntuación y stopwords) a la consulta para optimizar la búsqueda de datos, la velocidad de respuesta de la IA y disminuir porcentaje de errores.
 
 
