@@ -1,27 +1,29 @@
-import csv
+import pandas as pd
 import os
 
-def guardar_comprobante_csv(data):
-    archivo = "comprobantes.csv"
-    existe = os.path.exists(archivo)
 
-    with open(archivo, mode="a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not existe:
-            writer.writerow([
-                "Monto", "Fecha y hora", "Número de operación",
-                "Remitente nombre", "Remitente CUIT/CUIL", "Remitente CVU",
-                "Destinatario nombre", "Destinatario CUIT/CUIL", "Destinatario CVU"
-            ])
+CSV_FILE = 'comprobantes.csv'
 
-        writer.writerow([
-            data.get("monto", ""),
-            data.get("fecha_hora", ""),
-            data.get("nro_operacion", ""),
-            data.get("remitente", {}).get("nombre", ""),
-            data.get("remitente", {}).get("cuit_cuil", ""),
-            data.get("remitente", {}).get("cvu", ""),
-            data.get("destinatario", {}).get("nombre", ""),
-            data.get("destinatario", {}).get("cuit_cuil", ""),
-            data.get("destinatario", {}).get("cvu", "")
-        ])
+def guardar_comprobante_csv(comprobante_data: dict): 
+    """
+    Guarda los datos del comprobante en un archivo CSV usando Pandas.
+    Si el archivo ya existe, agrega la fila sin borrar los anteriores
+    """
+    #convertir los datos del comprobante a dataframe
+    df_nuevo = pd.DataFrame([comprobante_data])
+
+    #si el archivo existe, se agregan los nuevo datos
+
+    if os.path.isfile(CSV_FILE):
+        df_existente = pd.read_csv(CSV_FILE)
+        df_final = pd.concat([df_existente, df_nuevo], ignore_index=True)
+    else:
+        df_final = df_nuevo
+
+    #guardar el CSV actualizado
+    df_final.to_csv(CSV_FILE, index=False, encoding='utf-8-sig')
+
+    
+
+
+

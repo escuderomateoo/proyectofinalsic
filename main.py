@@ -140,23 +140,22 @@ def handle_voice_message(message: telebot.types.Message):
 
 
 
+
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
-        # obtener foto con la mayor resolucion
+        #obtener la foto con mayor resolución
         file_id = message.photo[-1].file_id
         file_info = bot.get_file(file_id)
-        file_url = (
-            f"https://api.telegram.org/file/bot{TELEGRAM_TOKEN}/{file_info.file_path}"
-        )
+        file_url = f"https://api.telegram.org/file/bot{TELEGRAM_TOKEN}/{file_info.file_path}"
 
         bot.reply_to(message, "🧠 Analizando la imagen...")
 
-        # llamo a la función que describe la imagen
+        #llamar a la función que describe la imagen
         descripcion = describir_imagen(file_url)
         ultima_imagen_por_chat[message.chat.id] = descripcion
 
-        # si detecta que es un comprobante o transferencia, hace la extracción directa
+        #si detecta que es un comprobante o transferencia, hace la extracción directa
         if any(palabra in descripcion.lower() for palabra in ["comprobante", "transferencia", "pago"]):
             bot.reply_to(message, "📄 Es un comprobante. Extrayendo los datos...")
 
@@ -177,9 +176,13 @@ def handle_foto(message):
             respuesta_groq = get_groq_response(prompt, bank_data)
 
             try:
+                # intentar interpretar la respuesta como JSON
                 comprobante_data = json.loads(respuesta_groq)
+
+                # guardar los datos con pandas
                 guardar_comprobante_csv(comprobante_data)
 
+                # Enviar el resumen directamente
                 resumen = (
                     "📄 *Resumen de la transferencia* 🤑\n"
                     f"*Monto:* {comprobante_data.get('Monto')}\n"
@@ -198,7 +201,7 @@ def handle_foto(message):
                 print("Respuesta Groq:", respuesta_groq)
 
         else:
-            # si no es comprobante, solo describe la imagen normalmente
+            #si no es comprobante, solo describe la imagen normalmente
             bot.reply_to(message, f"🖼️ Descripción:\n\n{descripcion}")
 
     except Exception as e:
