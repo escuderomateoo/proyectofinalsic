@@ -11,6 +11,7 @@ from apis.sentimiento import analizador_sentimiento
 from config import TELEGRAM_TOKEN
 from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen
+from apis.groq_api_foto import contexto_de_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 from apis.groq_api_csv import guardar_comprobante_csv
 from apis.groq_api_tarjeta import validar_luhn
@@ -71,7 +72,6 @@ def handle_text_message(message: telebot.types.Message):
         return
     
     ##comprobacion de tarjeta Luhn
-
     #Vuelvo el mensaje a texto plano
     user_message_raw = message.text
 
@@ -80,32 +80,16 @@ def handle_text_message(message: telebot.types.Message):
 
     #Devuelve si la tarjeta es o no real
     mensaje_validacion_luhn(patron_tarjeta,bot,message)
-            
+    
+    #Parte para que el contexto de la imagen se quede almacenado en el bot
     user_input = filtrar_texto(message.text)
 
     contexto_imagen = ultima_imagen_por_chat.get(message.chat.id)
-    
-    #funcion auxiliar para detectar si hay relación con imagen
-    def es_relacionado_a_imagen(texto: str) -> bool:
-        palabras_clave = [
-            "imagen", "foto", "en la imagen", "parece", "ves", "es eso", 
-            "quién es", "qué es", "está en la foto", "colores", "objeto", "animal"
-        ]
-        texto_lower = texto.lower()
-        return any(palabra in texto_lower for palabra in palabras_clave)
 
-    # si el mensaje parece relacionado, agregamos el contexto
-    if contexto_imagen and es_relacionado_a_imagen(user_input):
-        user_input = f"""Esta es una descripción previa de una imagen enviada por el usuario:\n\"{contexto_imagen}\"\n\nLuego el usuario escribió:\n\"{user_input}\"\n\nResponde en base a
-        -Si el usuario pregunta algo relacionado con la imagen, respondé en base a la descripción de la imagen y el texto del usuario.
-        -Si el usuario no pregunta nada relacionado con la imagen, respondé solo en base al texto del usuario.
-        -Si el usuario cambia de tema y no pregunta nada relacionado con la imagen, no hagas mención a la imagen en tu respuesta.
-        -Nunca digas que no podes procesar el mensaje del usuario.
-        """
-        
-    else:
-        # limpia el contexto si ya no se está usando
-        ultima_imagen_por_chat.pop(message.chat.id, None)
+    #funcion auxiliar para detectar si hay relación con la imagen
+    contexto = contexto_de_imagen(contexto_imagen,message,user_input,ultima_imagen_por_chat)
+    if contexto:
+        user_input=contexto
 
     bot.send_chat_action(message.chat.id, "typing")
     response = get_groq_response(user_input, bank_data)
