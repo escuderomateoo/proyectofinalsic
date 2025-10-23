@@ -17,8 +17,6 @@ from apis.groq_api_csv import guardar_comprobante_csv
 from apis.groq_api_tarjeta import validar_luhn
 from apis.groq_api_tarjeta import mensaje_validacion_luhn
 
-
-
 from groq import Groq 
 
 load_dotenv()
@@ -81,7 +79,7 @@ def handle_text_message(message: telebot.types.Message):
     #Devuelve si la tarjeta es o no real
     mensaje_validacion_luhn(patron_tarjeta,bot,message)
 
-    ##Agregar Contexto para seguir describiendo la imagen    
+    ##Agregar Contexto para seguir describiendo la imagen
     #Parte para que el contexto de la imagen se quede almacenado en el bot
     user_input = filtrar_texto(message.text)
 
