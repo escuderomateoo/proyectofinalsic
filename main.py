@@ -14,6 +14,8 @@ from apis.groq_api_foto import describir_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 from apis.groq_api_csv import guardar_comprobante_csv
 from apis.groq_api_tarjeta import validar_luhn
+from apis.groq_api_tarjeta import mensaje_validacion_luhn
+
 
 
 from groq import Groq 
@@ -68,36 +70,16 @@ def handle_text_message(message: telebot.types.Message):
         )
         return
     
-    
+    ##comprobacion de tarjeta Luhn
 
-    #comprobacion de tarjeta Luhn
-
+    #Vuelvo el mensaje a texto plano
     user_message_raw = message.text
-    #patron para buscar un numero que parezca de tarjeta (13 a 19 digitos)
 
+    #patron para buscar un numero que parezca de tarjeta (13 a 19 digitos)
     patron_tarjeta = re.search(r'([\d\s-]{11,23})', user_message_raw)
 
-    if patron_tarjeta:
-        # Captura la coincidencia completa, que incluye espacios y guiones
-        numero_a_validar_con_separadores = patron_tarjeta.group(0)
-        numero_a_validar = numero_a_validar_con_separadores.replace(' ', '').replace('-', '')
-        
-        print(f"DEBUG: Tarjeta detectada: {numero_a_validar[:4]}...{numero_a_validar[-4:]}")
-        if validar_luhn(numero_a_validar):
-
-            bot.reply_to(message,
-                         "⚠️ **¡Alerta de Seguridad!** ⚠️\n"
-                         "El número de tarjeta es potencialmente válido según el formato (Luhn), pero esto NO garantiza que sea real. Por seguridad, no envíes datos sensibles.")
-
-        else:
-            bot.reply_to(
-                message, 
-                "⚠️ **¡Alerta de Seguridad!** ⚠️\n"
-                f"El número detectado ({numero_a_validar[-4:]}...) NO es un formato válido de tarjeta según el Algoritmo de Luhn."
-            )
-
-        #termina funcion
-        return
+    #Devuelve si la tarjeta es o no real
+    mensaje_validacion_luhn(patron_tarjeta,bot,message)
             
     user_input = filtrar_texto(message.text)
 
@@ -121,7 +103,6 @@ def handle_text_message(message: telebot.types.Message):
         -Nunca digas que no podes procesar el mensaje del usuario.
         """
         
-       
     else:
         # limpia el contexto si ya no se está usando
         ultima_imagen_por_chat.pop(message.chat.id, None)
@@ -137,7 +118,6 @@ def handle_text_message(message: telebot.types.Message):
             "Lo siento, hubo un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
-
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -171,9 +151,6 @@ def handle_voice_message(message: telebot.types.Message):
             "Ocurrió un error al procesar tu consulta.\n"
             "Podés escribirnos a info@agushermosodev.com.ar para más información.",
         )
-
-
-
 
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
@@ -241,14 +218,12 @@ def handle_foto(message):
     except Exception as e:
         bot.reply_to(message, f"❌ Error al procesar la imagen: {str(e)}")
 
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
     call.text = call.data
     respuesta = get_groq_response(filtrar_texto(call.text), bank_data)
     bot.send_chat_action(call.message.chat.id, "typing")
     bot.send_message(call.message.chat.id, respuesta)
-
 
 if __name__ == "__main__":
     if bank_data:
