@@ -80,7 +80,8 @@ def handle_text_message(message: telebot.types.Message):
 
     #Devuelve si la tarjeta es o no real
     mensaje_validacion_luhn(patron_tarjeta,bot,message)
-    
+
+    ##Agregar Contexto para seguir describiendo la imagen    
     #Parte para que el contexto de la imagen se quede almacenado en el bot
     user_input = filtrar_texto(message.text)
 
