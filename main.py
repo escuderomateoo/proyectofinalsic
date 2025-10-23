@@ -1,6 +1,8 @@
 import os
 import time
 import telebot
+import json
+import re
 from apis.filtrado_de_texto import filtrar_texto
 from dotenv import load_dotenv
 from typing import Optional
@@ -11,7 +13,8 @@ from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 from apis.groq_api_csv import guardar_comprobante_csv
-import json
+from apis.groq_api_tarjeta import validar_luhn
+
 
 from groq import Groq 
 
@@ -65,6 +68,37 @@ def handle_text_message(message: telebot.types.Message):
         )
         return
     
+    
+
+    #comprobacion de tarjeta Luhn
+
+    user_message_raw = message.text
+    #patron para buscar un numero que parezca de tarjeta (13 a 19 digitos)
+
+    patron_tarjeta = re.search(r'([\d\s-]{11,23})', user_message_raw)
+
+    if patron_tarjeta:
+        # Captura la coincidencia completa, que incluye espacios y guiones
+        numero_a_validar_con_separadores = patron_tarjeta.group(0)
+        numero_a_validar = numero_a_validar_con_separadores.replace(' ', '').replace('-', '')
+        
+        print(f"DEBUG: Tarjeta detectada: {numero_a_validar[:4]}...{numero_a_validar[-4:]}")
+        if validar_luhn(numero_a_validar):
+
+            bot.reply_to(message,
+                         "⚠️ **¡Alerta de Seguridad!** ⚠️\n"
+                         "El número de tarjeta es potencialmente válido según el formato (Luhn), pero esto NO garantiza que sea real. Por seguridad, no envíes datos sensibles.")
+
+        else:
+            bot.reply_to(
+                message, 
+                "⚠️ **¡Alerta de Seguridad!** ⚠️\n"
+                f"El número detectado ({numero_a_validar[-4:]}...) NO es un formato válido de tarjeta según el Algoritmo de Luhn."
+            )
+
+        #termina funcion
+        return
+            
     user_input = filtrar_texto(message.text)
 
     contexto_imagen = ultima_imagen_por_chat.get(message.chat.id)
