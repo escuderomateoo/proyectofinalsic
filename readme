@@ -1,4 +1,16 @@
-🤖 Asistente de Bancos en Telegram
+
+$$$$$$$\  $$$$$$$\   $$$$$$\ $$\     $$\ $$$$$$$$\  $$$$$$\ $$$$$$$$\  $$$$$$\        $$$$$$$$\ $$$$$$\ $$\   $$\  $$$$$$\  $$\              $$$$$$\  $$$$$$\  $$$$$$\  
+$$  __$$\ $$  __$$\ $$  __$$\\$$\   $$  |$$  _____|$$  __$$\\__$$  __|$$  __$$\       $$  _____|\_$$  _|$$$\  $$ |$$  __$$\ $$ |            $$  __$$\ \_$$  _|$$  __$$\ 
+$$ |  $$ |$$ |  $$ |$$ /  $$ |\$$\ $$  / $$ |      $$ /  \__|  $$ |   $$ /  $$ |      $$ |        $$ |  $$$$\ $$ |$$ /  $$ |$$ |            $$ /  \__|  $$ |  $$ /  \__|
+$$$$$$$  |$$$$$$$  |$$ |  $$ | \$$$$  /  $$$$$\    $$ |        $$ |   $$ |  $$ |      $$$$$\      $$ |  $$ $$\$$ |$$$$$$$$ |$$ |            \$$$$$$\    $$ |  $$ |      
+$$  ____/ $$  __$$< $$ |  $$ |  \$$  /   $$  __|   $$ |        $$ |   $$ |  $$ |      $$  __|     $$ |  $$ \$$$$ |$$  __$$ |$$ |             \____$$\   $$ |  $$ |      
+$$ |      $$ |  $$ |$$ |  $$ |   $$ |    $$ |      $$ |  $$\   $$ |   $$ |  $$ |      $$ |        $$ |  $$ |\$$$ |$$ |  $$ |$$ |            $$\   $$ |  $$ |  $$ |  $$\ 
+$$ |      $$ |  $$ | $$$$$$  |   $$ |    $$$$$$$$\ \$$$$$$  |  $$ |    $$$$$$  |      $$ |      $$$$$$\ $$ | \$$ |$$ |  $$ |$$$$$$$$\       \$$$$$$  |$$$$$$\ \$$$$$$  |
+\__|      \__|  \__| \______/    \__|    \________| \______/   \__|    \______/       \__|      \______|\__|  \__|\__|  \__|\________|       \______/ \______| \______/ 
+                                                                                                                                                                        
+                                                                                                                                                                        
+#🤖 Asistente de Bancos en Telegram
+
 Asistente conversacional para Telegram, impulsado por Groq, este bot esta diseñado para responder consultas bancarias en español mediante una base de datos local y realizar análisis de sentimiento, entre otras cosas que se detallan a continuación.
 
 Requisitos del Sistema
@@ -32,8 +44,7 @@ python main.py
 Luego, en Telegram, buscá tu bot y enviá:
 /start o /help para iniciar la conversación.
 
-
-✨ Funcionalidades Destacadas
+#✨ Funcionalidades Destacadas
 
 -Respuesta Asistida por IA: Cualquier consulta es procesada por el modelo de Groq, que utiliza el contenido de dataset.json como contexto para dar respuestas precisas y conversacionales.
 
