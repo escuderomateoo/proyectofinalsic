@@ -63,6 +63,19 @@ Luego, en Telegram, buscá tu bot y enviá:
     * Aumentar la velocidad de respuesta.
     * Disminuir errores.
 
+    -Gestión de Usuarios y Saldos (Sistema Simulado)
+    * El bot incluye una simulación bancaria para probar operaciones entre usuarios:
+    * Comandos disponibles:
+
+    * /crear nombre saldo_inicial → Crea un nuevo usuario con el saldo indicado.
+    * /saldo nombre → Muestra el saldo actual del usuario.
+    * /transferir origen destino monto → Transfiere dinero entre usuarios (actualizando automáticamente los saldos).
+
+    - El archivo usuarios.json:
+
+    * Se genera automáticamente si no existe.
+    * Guarda los datos de todos los usuarios y sus saldos.
+    * Se actualiza en tiempo real cada vez que se realiza una transferencia.
 
 ## ⚠️ IMPORTANTE
 
