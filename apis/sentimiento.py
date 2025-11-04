@@ -1,5 +1,5 @@
 from transformers import pipeline
-from filtrado_de_texto import filtrar_texto
+from apis.filtrado_de_texto import filtrar_texto
 import pandas as pd
 import numpy as np
 
