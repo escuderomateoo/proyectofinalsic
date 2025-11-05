@@ -66,16 +66,34 @@ Luego, en Telegram, buscá tu bot y enviá:
     -Gestión de Usuarios y Saldos (Sistema Simulado)
     * El bot incluye una simulación bancaria para probar operaciones entre usuarios:
     * Comandos disponibles:
+     -Gestión de Carpetas (Sistema de categorización de gastos)
+     - El bot ahora gestiona "carpetas" para organizar montos/dinero por categorías.
+     - Comandos disponibles:
 
-    * /crear nombre saldo_inicial → Crea un nuevo usuario con el saldo indicado.
-    * /saldo nombre → Muestra el saldo actual del usuario.
-    * /transferir origen destino monto → Transfiere dinero entre usuarios (actualizando automáticamente los saldos).
+    * /crear nombre dinero_inicial → Crea una carpeta con el monto inicial especificado.
+    * /depositar destino monto → Suma `monto` a la carpeta `destino`.
+    * /transferir origen destino monto → Mueve `monto` de la carpeta `origen` a la carpeta `destino`.
+    * /gasto nombre → Muestra el dinero actual en la carpeta `nombre`.
+    * /resumen (o /resumen_gastos) → Devuelve un resumen con cada carpeta y el total acumulado.
 
-    - El archivo usuarios.json:
+     - El archivo `carpetas.json`:
 
     * Se genera automáticamente si no existe.
-    * Guarda los datos de todos los usuarios y sus saldos.
-    * Se actualiza en tiempo real cada vez que se realiza una transferencia.
+    * Guarda las carpetas como claves y en cada una un objeto con la propiedad `dinero`.
+    * Ejemplo de estructura:
+
+    ```json
+    {
+    "escuela": {
+        "dinero": 1100.0
+    },
+    "celular": {
+        "dinero": 5.0
+    }
+}
+    ```
+
+    * Se actualiza automáticamente cuando se usan los comandos mencionados.
 
 ## ⚠️ IMPORTANTE
 

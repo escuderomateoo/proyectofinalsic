@@ -15,7 +15,7 @@ from apis.groq_api_foto import describir_imagen, contexto_de_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 from apis.groq_api_csv import guardar_comprobante_csv
 from apis.groq_api_tarjeta import validar_luhn, mensaje_validacion_luhn
-from apis.usuarios import cargar_usuarios, guardar_usuarios
+from apis.carpetas import cargar_carpetas, guardar_carpetas, crear_carpeta, ver_gasto, depositar, quitar
 from config import TELEGRAM_TOKEN
 
 
@@ -30,25 +30,6 @@ ultima_imagen_por_chat = {}
 
 # CARGA BASE DE DATOS DE BANCOS
 bank_data = load_bank_data()
-
-
-# SISTEMA DE USUARIOS
-
-
-RUTA_USUARIOS = "usuarios.json"
-
-def cargar_usuarios():
-    """Carga o crea el archivo usuarios.json"""
-    if not os.path.exists(RUTA_USUARIOS):
-        with open(RUTA_USUARIOS, "w") as f:
-            json.dump({}, f)
-    with open(RUTA_USUARIOS, "r") as f:
-        return json.load(f)
-
-def guardar_usuarios(usuarios):
-    """Guarda los usuarios en el archivo JSON"""
-    with open(RUTA_USUARIOS, "w") as f:
-        json.dump(usuarios, f, indent=4)
 
 
 # COMANDOS DEL BOT
@@ -83,89 +64,98 @@ def cmd_sentimiento(message):
     bot.reply_to(message, resultado)
 
 
-# CREAR USUARIO
 @bot.message_handler(commands=["crear"])
-def cmd_crear_usuario(message):
+def cmd_crear_carpeta(message):
     partes = message.text.split()
     if len(partes) < 3:
-        bot.reply_to(message, "Uso: /crear nombre saldo_inicial")
+        bot.reply_to(message, "Uso: /crear nombre dinero_inicial")
         return
 
     nombre = partes[1]
     try:
-        saldo = float(partes[2])
+        dinero = float(partes[2])
     except ValueError:
-        bot.reply_to(message, "⚠️ El saldo inicial debe ser un número.")
+        bot.reply_to(message, "⚠️ El dinero inicial debe ser un número.")
         return
 
-    usuarios = cargar_usuarios()
-    if nombre in usuarios:
-        bot.reply_to(message, f"⚠️ El usuario '{nombre}' ya existe.")
-        return
-
-    usuarios[nombre] = {"saldo": saldo}
-    guardar_usuarios(usuarios)
-    bot.reply_to(message, f"✅ Usuario '{nombre}' creado con saldo inicial ${saldo:.2f}")
+    resultado = crear_carpeta(nombre, dinero)
+    bot.reply_to(message, resultado)
 
 
-# CONSULTAR SALDO
-@bot.message_handler(commands=["saldo"])
-def cmd_ver_saldo(message):
+@bot.message_handler(commands=["gasto"])
+def cmd_ver_gasto(message):
     partes = message.text.split()
     if len(partes) < 2:
-        bot.reply_to(message, "Uso: /saldo nombre")
+        bot.reply_to(message, "Uso: /gasto nombre")
         return
 
     nombre = partes[1]
-    usuarios = cargar_usuarios()
+    resultado = ver_gasto(nombre)
+    bot.reply_to(message, resultado)
 
-    if nombre not in usuarios:
-        bot.reply_to(message, f"❌ El usuario '{nombre}' no existe.")
+
+@bot.message_handler(commands=["resumen", "resumen_gastos"])
+def cmd_resumen(message):
+    """Devuelve un resumen de todas las carpetas y el total de dinero."""
+    carpetas = cargar_carpetas()
+    if not carpetas:
+        bot.reply_to(message, "No hay carpetas registradas.")
         return
 
-    saldo = usuarios[nombre]["saldo"]
-    bot.reply_to(message, f"💰 Saldo actual de {nombre}: ${saldo:.2f}")
-
-
-# TRANSFERIR 
-@bot.message_handler(commands=["transferir"])
-def cmd_transferir(message):
-    partes = message.text.split()
-    if len(partes) < 4:
-        bot.reply_to(message, "Uso: /transferir origen destino monto")
-        return
-
-    origen, destino = partes[1], partes[2]
+    lineas = []
+    total = 0.0
+    # Ordenamos por dinero descendente para mostrar primero las carpetas con mayor monto
     try:
-        monto = float(partes[3])
+        items = sorted(carpetas.items(), key=lambda x: float(x[1].get("dinero", 0)), reverse=True)
+    except Exception:
+        items = carpetas.items()
+
+    for nombre, datos in items:
+        dinero = float(datos.get("dinero", 0)) if isinstance(datos, dict) else 0.0
+        lineas.append(f"- {nombre}: ${dinero:.2f}")
+        total += dinero
+
+    lineas.append(f"\nTotal: ${total:.2f}")
+    mensaje = "Resumen de carpetas:\n" + "\n".join(lineas)
+    bot.reply_to(message, mensaje)
+
+
+@bot.message_handler(commands=["depositar"])
+def cmd_depositar(message):
+    partes = message.text.split()
+    # El comando espera: /depositar destino monto 
+    if len(partes) < 3:
+        bot.reply_to(message, "Uso: /depositar destino monto")
+        return
+
+    destino = partes[1]
+    try:
+        monto = float(partes[2])
     except ValueError:
         bot.reply_to(message, "⚠️ El monto debe ser un número.")
         return
 
-    usuarios = cargar_usuarios()
+    # Delegamos la lógica al módulo de carpetas
+    resultado = depositar(destino, monto)
+    bot.reply_to(message, resultado)
 
-    if origen not in usuarios:
-        bot.reply_to(message, f"❌ El usuario origen '{origen}' no existe.")
+@bot.message_handler(commands=["quitar"])
+def cmd_quitar(message):
+    partes = message.text.split()
+    # El comando espera: /quitar destino monto
+    if len(partes) < 3:
+        bot.reply_to(message, "Uso: /quitar destino monto")
         return
-    if destino not in usuarios:
-        bot.reply_to(message, f"❌ El usuario destino '{destino}' no existe.")
+    destino = partes[1]
+    try:
+        monto = float(partes[2])
+    except ValueError:
+        bot.reply_to(message, "⚠️ El monto debe ser un número.")
         return
-    if usuarios[origen]["saldo"] < monto:
-        bot.reply_to(message, "⚠️ Saldo insuficiente.")
-        return
-
-    usuarios[origen]["saldo"] -= monto
-    usuarios[destino]["saldo"] += monto
-    guardar_usuarios(usuarios)
-
-    bot.reply_to(
-        message,
-        f"✅ Transferencia realizada: ${monto:.2f}\n"
-        f"De {origen} → {destino}\n"
-        f"Nuevo saldo de {origen}: ${usuarios[origen]['saldo']:.2f}\n"
-        f"Nuevo saldo de {destino}: ${usuarios[destino]['saldo']:.2f}"
-    )
-
+    
+    # Delegamos la lógica al módulo de carpetas
+    resultado = quitar(destino, monto)
+    bot.reply_to(message, resultado)
 
 
 # MENSAJES DE TEXTO (PASA A GROQ SI NO ES UN COMANDO)
