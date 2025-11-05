@@ -54,11 +54,13 @@ class EstadoDelChat:
             #Almacenamiento en el archivo "mensajes_mean.csv"
             datos_entrada = pd.read_csv("mensajes_mean.csv")
             df_total = pd.concat([datos_entrada, frame_2], ignore_index=True)
+            df_total = df_total.sort_values(by=df_total.columns[0])
             df_total.to_csv("mensajes_mean.csv",index=False)
 
             #Almacenamiento en el archvio "mensajes.csv"
             datos_entrada = pd.read_csv('mensajes.csv')
             df_total = pd.concat([datos_entrada,frame_1],ignore_index=True)
+            df_total = df_total.sort_values(by=df_total.columns[0])
             df_total.to_csv('mensajes.csv',index=False)
 
         except Exception as e:
