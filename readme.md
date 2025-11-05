@@ -63,16 +63,10 @@ Luego, en Telegram, buscá tu bot y enviá:
     * Aumentar la velocidad de respuesta.
     * Disminuir errores.
 
-    -Gestión de Usuarios y Saldos (Sistema Simulado)
-    * El bot incluye una simulación bancaria para probar operaciones entre usuarios:
-    * Comandos disponibles:
-     -Gestión de Carpetas (Sistema de categorización de gastos)
-     - El bot ahora gestiona "carpetas" para organizar montos/dinero por categorías.
-     - Comandos disponibles:
-
-    * /crear nombre dinero_inicial → Crea una carpeta con el monto inicial especificado.
-    * /depositar destino monto → Suma `monto` a la carpeta `destino`.
-    * /transferir origen destino monto → Mueve `monto` de la carpeta `origen` a la carpeta `destino`.
+   
+    -Gestión de gastos (por categoría)
+    * /crear nombre dinero_inicial → Crea una categoría con el nombre y monto inicial especificado.
+    * /depositar destino monto → Suma `monto` a la categoría `destino`.
     * /gasto nombre → Muestra el dinero actual en la carpeta `nombre`.
     * /resumen (o /resumen_gastos) → Devuelve un resumen con cada carpeta y el total acumulado.
 
@@ -95,9 +89,6 @@ Luego, en Telegram, buscá tu bot y enviá:
 
     * Se actualiza automáticamente cuando se usan los comandos mencionados.
 
-## ⚠️ IMPORTANTE
-
-    * Una vez activado el bot, los comandos de la terminal dejan de funcionar.
 
 ## 👨‍💻 Desarrolladores y Agradecimientos
 
