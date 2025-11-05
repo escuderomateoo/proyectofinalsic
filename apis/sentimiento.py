@@ -63,6 +63,3 @@ class EstadoDelChat:
 
         except Exception as e:
             return print(f'No se pudo almacenar los datos en el csv {e}')
-        
-
-            

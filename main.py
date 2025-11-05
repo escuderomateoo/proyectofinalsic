@@ -9,7 +9,7 @@ from typing import Optional
 # IMPORTACIONES DE APIS
 from apis.filtrado_de_texto import filtrar_texto
 from apis.groq_api_texto import get_groq_response
-from apis.sentimiento import analizador_sentimiento
+from apis.sentimiento import analizador_sentimiento, EstadoDelChat
 from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen, contexto_de_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
@@ -31,12 +31,16 @@ ultima_imagen_por_chat = {}
 # CARGA BASE DE DATOS DE BANCOS
 bank_data = load_bank_data()
 
-
+#Instancia del message sentiment
+chat_worker = ''
 # COMANDOS DEL BOT
-
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
+    #Parte para EstadoDelChat
+    global chat_worker
+    chat_worker = EstadoDelChat(message.chat.id)
+    #Parte Real
     markup = telebot.types.InlineKeyboardMarkup()
     markup.row_width = 2
     for preguntas in bank_data["faqs"]:
@@ -53,19 +57,23 @@ def welcome_message(message: telebot.types.Message):
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
 
-@bot.message_handler(commands=["sentimiento"])
-def cmd_sentimiento(message):
-    texto = message.text
-    if len(texto.split(" ", 1)) < 2:
-        bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
-        return
-    frase = texto.split(" ", 1)[1].strip('"')
-    resultado = analizador_sentimiento(frase)
-    bot.reply_to(message, resultado)
+# @bot.message_handler(commands=["sentimiento"])
+# def cmd_sentimiento(message):
+#     texto = message.text
+#     if len(texto.split(" ", 1)) < 2:
+#         bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
+#         return
+#     frase = texto.split(" ", 1)[1].strip('"')
+#     resultado = analizador_sentimiento(frase)
+#     bot.reply_to(message, resultado)
 
 
 @bot.message_handler(commands=["crear"])
 def cmd_crear_carpeta(message):
+    #Absorcion del mensaje
+    global chat_worker
+    
+    #Funcion normal
     partes = message.text.split()
     if len(partes) < 3:
         bot.reply_to(message, "Uso: /crear nombre dinero_inicial")
@@ -157,12 +165,15 @@ def cmd_quitar(message):
     resultado = quitar(destino, monto)
     bot.reply_to(message, resultado)
 
-
 # MENSAJES DE TEXTO (PASA A GROQ SI NO ES UN COMANDO)
-
 
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
+    #Parte para EstadoDelChat
+    global chat_worker
+    chat_worker.agregar_mensaje(message.text)
+    chat_worker.devolucion()
+    #Parte Real
     if not bank_data:
         bot.reply_to(
             message, "Error cargando los datos de los bancos. Intente más tarde."
@@ -199,10 +210,7 @@ def handle_text_message(message: telebot.types.Message):
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
 
-
-
 # AUDIO Y FOTO
-
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -225,9 +233,14 @@ def handle_voice_message(message: telebot.types.Message):
     if not transcription:
         bot.reply_to(message, "No pude transcribir el audio. Probá de nuevo.")
         return
-
+    #Parte para EstadoDelChat
+    global chat_worker
+    chat_worker.agregar_mensaje(message.text)
+    chat_worker.devolucion()
+    #Parte Real
     response = get_groq_response(transcription, bank_data)
     bot.reply_to(message, response or "Error al procesar tu consulta.")
+
 
 
 @bot.message_handler(content_types=["photo"])
