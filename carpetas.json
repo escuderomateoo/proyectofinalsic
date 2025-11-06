@@ -7,5 +7,8 @@
     },
     "hobbies": {
         "dinero": 100.0
+    },
+    "facultad": {
+        "dinero": 100.0
     }
 }

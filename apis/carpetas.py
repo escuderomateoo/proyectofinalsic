@@ -64,18 +64,6 @@ class CarpetasManager:
         self._save(data)
         return f"✅ Resta realizada: ${monto} ← {destino}"
 
-    def transferir(self, origen: str, destino: str, monto: float) -> str:
-        data = self._load()
-        if origen not in data:
-            return f"❌ La carpeta origen '{origen}' no existe."
-        if destino not in data:
-            return f"❌ La carpeta destino '{destino}' no existe."
-        if float(data[origen].get("dinero", 0)) < float(monto):
-            return "⚠️ Dinero insuficiente para transferir."
-        data[origen]["dinero"] = float(data[origen].get("dinero", 0)) - float(monto)
-        data[destino]["dinero"] = float(data[destino].get("dinero", 0)) + float(monto)
-        self._save(data)
-        return f"✅ Transferencia realizada: ${monto} de {origen} → {destino}"
 
     def resumen(self) -> str:
         data = self._load()
@@ -135,16 +123,6 @@ class CarpetasManager:
             return "⚠️ El monto debe ser un número."
         return self.quitar(destino, monto)
 
-    def handle_transferir(self, texto_comando: str) -> str:
-        partes = texto_comando.split()
-        if len(partes) < 4:
-            return "Uso: /transferir origen destino monto"
-        origen, destino = partes[1], partes[2]
-        try:
-            monto = float(partes[3])
-        except ValueError:
-            return "⚠️ El monto debe ser un número."
-        return self.transferir(origen, destino, monto)
 
     def handle_resumen(self, texto_comando: Optional[str] = None) -> str:
         # texto_comando no es usado pero se mantiene para simetría con otros handlers
@@ -173,8 +151,7 @@ def depositar(destino: str, monto: float) -> str:
 def quitar(destino: str, monto: float) -> str:
     return default_manager.quitar(destino, monto)
 
-def transferir(origen: str, destino: str, monto: float) -> str:
-    return default_manager.transferir(origen, destino, monto)
+# Nota: la funcionalidad de transferir fue eliminada intencionalmente.
 
 def handle_crear(texto_comando: str) -> str:
     return default_manager.handle_crear(texto_comando)
@@ -188,8 +165,14 @@ def handle_depositar(texto_comando: str) -> str:
 def handle_quitar(texto_comando: str) -> str:
     return default_manager.handle_quitar(texto_comando)
 
-def handle_transferir(texto_comando: str) -> str:
-    return default_manager.handle_transferir(texto_comando)
+# Compatibilidad: si hay código antiguo que aún importa /transferir
+def handle_transferir(*args, **kwargs) -> str:
+    """Compatibilidad: la operación /transferir fue eliminada.
+
+    Mantener este stub evita ImportError en `main.py` mientras se actualiza
+    el código que invocaba la transferencia entre carpetas.
+    """
+    return "❌ La operación /transferir ya no está disponible. Usa /depositar y /quitar en su lugar."
 
 def handle_resumen(texto_comando: Optional[str] = None) -> str:
     return default_manager.handle_resumen(texto_comando)
