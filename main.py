@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from typing import Optional
 
 # IMPORTACIONES DE APIS
+from apis.sentimiento import EstadoDelChat
 from apis.filtrado_de_texto import filtrar_texto
 from apis.groq_api_texto import get_groq_response
 from apis.sentimiento import analizador_sentimiento
@@ -25,8 +26,6 @@ from apis.carpetas import (
 )
 from config import TELEGRAM_TOKEN
 
-
-
 load_dotenv()
 
 if not TELEGRAM_TOKEN:
@@ -38,12 +37,14 @@ ultima_imagen_por_chat = {}
 # CARGA BASE DE DATOS DE BANCOS
 bank_data = load_bank_data()
 
-
 # COMANDOS DEL BOT
-
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
+    #Parte EstadoChat
+    global chat_worker
+    chat_worker = EstadoDelChat(message.chat.id)
+    #Parte Principal de la funcion
     markup = telebot.types.InlineKeyboardMarkup()
     markup.row_width = 2
     for preguntas in bank_data["faqs"]:
@@ -136,12 +137,15 @@ def cmd_quitar(message):
     resultado = handle_quitar(message.text)
     bot.reply_to(message, resultado)
 
-
 # MENSAJES DE TEXTO (PASA A GROQ SI NO ES UN COMANDO)
-
 
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
+    #Parte EstadoChat
+    global chat_worker
+    chat_worker.agregar_mensaje(message.text)
+    chat_worker.devolucion()
+    #Parte Principal
     if not bank_data:
         bot.reply_to(
             message, "Error cargando los datos de los bancos. Intente más tarde."
@@ -178,10 +182,7 @@ def handle_text_message(message: telebot.types.Message):
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
 
-
-
 # AUDIO Y FOTO
-
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -204,7 +205,11 @@ def handle_voice_message(message: telebot.types.Message):
     if not transcription:
         bot.reply_to(message, "No pude transcribir el audio. Probá de nuevo.")
         return
-
+    #Parte EstadoChat
+    global chat_worker
+    chat_worker.agregar_mensaje(transcription)
+    chat_worker.devolucion()
+    #Parte Principal
     response = get_groq_response(transcription, bank_data)
     bot.reply_to(message, response or "Error al procesar tu consulta.")
 
