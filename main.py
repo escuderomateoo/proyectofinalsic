@@ -9,13 +9,20 @@ from typing import Optional
 # IMPORTACIONES DE APIS
 from apis.filtrado_de_texto import filtrar_texto
 from apis.groq_api_texto import get_groq_response
-from apis.sentimiento import analizador_sentimiento, EstadoDelChat
+from apis.sentimiento import analizador_sentimiento
 from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen, contexto_de_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
 from apis.groq_api_csv import guardar_comprobante_csv
 from apis.groq_api_tarjeta import validar_luhn, mensaje_validacion_luhn
-from apis.carpetas import cargar_carpetas, guardar_carpetas, crear_carpeta, ver_gasto, depositar, quitar
+from apis.carpetas import (
+    handle_crear,
+    handle_gasto,
+    handle_depositar,
+    handle_quitar,
+    handle_transferir,
+    handle_resumen,
+)
 from config import TELEGRAM_TOKEN
 
 
@@ -31,16 +38,12 @@ ultima_imagen_por_chat = {}
 # CARGA BASE DE DATOS DE BANCOS
 bank_data = load_bank_data()
 
-#Instancia del message sentiment
-chat_worker = ''
+
 # COMANDOS DEL BOT
+
 
 @bot.message_handler(commands=["start"])
 def welcome_message(message: telebot.types.Message):
-    #Parte para EstadoDelChat
-    global chat_worker
-    chat_worker = EstadoDelChat(message.chat.id)
-    #Parte Real
     markup = telebot.types.InlineKeyboardMarkup()
     markup.row_width = 2
     for preguntas in bank_data["faqs"]:
@@ -56,6 +59,7 @@ def welcome_message(message: telebot.types.Message):
     )
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
+<<<<<<< Updated upstream
 # @bot.message_handler(commands=["sentimiento"])
 # def cmd_sentimiento(message):
 #     texto = message.text
@@ -65,13 +69,21 @@ def welcome_message(message: telebot.types.Message):
 #     frase = texto.split(" ", 1)[1].strip('"')
 #     resultado = analizador_sentimiento(frase)
 #     bot.reply_to(message, resultado)
+=======
+
+@bot.message_handler(commands=["sentimiento"])
+def cmd_sentimiento(message):
+    texto = message.text
+    if len(texto.split(" ", 1)) < 2:
+        bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
+        return
+    frase = texto.split(" ", 1)[1].strip('"')
+    resultado = analizador_sentimiento(frase)
+    bot.reply_to(message, resultado)
+>>>>>>> Stashed changes
 
 @bot.message_handler(commands=["crear"])
 def cmd_crear_carpeta(message):
-    #Absorcion del mensaje
-    global chat_worker
-    
-    #Funcion normal
     partes = message.text.split()
     if len(partes) < 3:
         bot.reply_to(message, "Uso: /crear nombre dinero_inicial")
@@ -83,8 +95,7 @@ def cmd_crear_carpeta(message):
     except ValueError:
         bot.reply_to(message, "⚠️ El dinero inicial debe ser un número.")
         return
-
-    resultado = crear_carpeta(nombre, dinero)
+    resultado = handle_crear(message.text)
     bot.reply_to(message, resultado)
 
 @bot.message_handler(commands=["gasto"])
@@ -94,34 +105,14 @@ def cmd_ver_gasto(message):
         bot.reply_to(message, "Uso: /gasto nombre")
         return
 
-    nombre = partes[1]
-    resultado = ver_gasto(nombre)
+    resultado = handle_gasto(message.text)
     bot.reply_to(message, resultado)
 
 @bot.message_handler(commands=["resumen", "resumen_gastos"])
 def cmd_resumen(message):
     """Devuelve un resumen de todas las carpetas y el total de dinero."""
-    carpetas = cargar_carpetas()
-    if not carpetas:
-        bot.reply_to(message, "No hay carpetas registradas.")
-        return
-
-    lineas = []
-    total = 0.0
-    # Ordenamos por dinero descendente para mostrar primero las carpetas con mayor monto
-    try:
-        items = sorted(carpetas.items(), key=lambda x: float(x[1].get("dinero", 0)), reverse=True)
-    except Exception:
-        items = carpetas.items()
-
-    for nombre, datos in items:
-        dinero = float(datos.get("dinero", 0)) if isinstance(datos, dict) else 0.0
-        lineas.append(f"- {nombre}: ${dinero:.2f}")
-        total += dinero
-
-    lineas.append(f"\nTotal: ${total:.2f}")
-    mensaje = "Resumen de carpetas:\n" + "\n".join(lineas)
-    bot.reply_to(message, mensaje)
+    resultado = handle_resumen(message.text)
+    bot.reply_to(message, resultado)
 
 @bot.message_handler(commands=["depositar"])
 def cmd_depositar(message):
@@ -138,8 +129,7 @@ def cmd_depositar(message):
         bot.reply_to(message, "⚠️ El monto debe ser un número.")
         return
 
-    # Delegamos la lógica al módulo de carpetas
-    resultado = depositar(destino, monto)
+    resultado = handle_depositar(message.text)
     bot.reply_to(message, resultado)
 
 @bot.message_handler(commands=["quitar"])
@@ -156,19 +146,15 @@ def cmd_quitar(message):
         bot.reply_to(message, "⚠️ El monto debe ser un número.")
         return
     
-    # Delegamos la lógica al módulo de carpetas
-    resultado = quitar(destino, monto)
+    resultado = handle_quitar(message.text)
     bot.reply_to(message, resultado)
+
 
 # MENSAJES DE TEXTO (PASA A GROQ SI NO ES UN COMANDO)
 
+
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
-    #Parte para EstadoDelChat
-    global chat_worker
-    chat_worker.agregar_mensaje(message.text)
-    chat_worker.devolucion()
-    #Parte Real
     if not bank_data:
         bot.reply_to(
             message, "Error cargando los datos de los bancos. Intente más tarde."
@@ -205,7 +191,10 @@ def handle_text_message(message: telebot.types.Message):
             "Podés escribirnos a info@agushermoso.com.ar para más información.",
         )
 
+
+
 # AUDIO Y FOTO
+
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -228,14 +217,14 @@ def handle_voice_message(message: telebot.types.Message):
     if not transcription:
         bot.reply_to(message, "No pude transcribir el audio. Probá de nuevo.")
         return
-    #Parte para EstadoDelChat
-    global chat_worker
-    chat_worker.agregar_mensaje(message.text)
-    chat_worker.devolucion()
-    #Parte Real
+
     response = get_groq_response(transcription, bank_data)
     bot.reply_to(message, response or "Error al procesar tu consulta.")
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
