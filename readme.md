@@ -75,7 +75,7 @@ Luego, en Telegram, buscá tu bot y enviá:
     * Se genera automáticamente si no existe.
     * Guarda las carpetas como claves y en cada una un objeto con la propiedad `dinero`.
     * Ejemplo de estructura:
-
+    
     ```json
     {
     "escuela": {
@@ -84,11 +84,25 @@ Luego, en Telegram, buscá tu bot y enviá:
     "celular": {
         "dinero": 5.0
     }
-}
+    }
     ```
 
     * Se actualiza automáticamente cuando se usan los comandos mencionados.
 
+    - Analisis del Chat por IA
+    El proyecto incluye un módulo adicional que realiza análisis de sentimiento sobre los mensajes enviados por los usuarios en Telegram.
+    Este análisis permite identificar la tendencia emocional general de cada usuario (por ejemplo, si suele ser positivo, neutro o negativo en sus reseñas o mensajes al bot).
+
+    ⚙️ Funcionamiento
+
+    Cada vez que un usuario envía un mensaje, este se almacena junto con su chat_id.
+
+    El módulo envía el texto a una API de Groq, que devuelve una puntuación de sentimiento (expresada como número de “⭐ estrellas” o un valor numérico).
+
+    El  resultado se guarda en:
+
+    mensajes.csv → contiene cada mensaje con su puntuación individual.
+    mensajes_mean.csv → resume el promedio de sentimiento por cada chat.
 
 ## 👨‍💻 Desarrolladores y Agradecimientos
 
