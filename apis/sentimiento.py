@@ -23,7 +23,7 @@ class EstadoDelChat:
     
     def agregar_mensaje(self,mensaje):
         assert type(mensaje)==str ,'El argumento tiene que ser un str'
-        self.__mensajes.append(filtrar_texto(mensaje))
+        self.__mensajes.append(mensaje)
     
     def analizar_mensajes(self):
         notas = []
@@ -37,18 +37,18 @@ class EstadoDelChat:
         return  notas, confianzas, promedio_notas,promedio_confianzas
 
     def devolucion(self):
-        if len(self.__mensajes)<=5:
-            return None
+        if len(self.__mensajes)<5:
+            return print(len(self.__mensajes),self.__mensajes)
         else:
             #Frame 1 de notas y la confianzas respectivas, con el codigo del chat
             datos_1 = self.analizar_mensajes()
+            print(self.__mensajes)
             frame_1 = pd.DataFrame({
                                     "Codigo_Chat" : [self.__codigo]*len(datos_1[0]),
                                     "Nota": datos_1[0],
                                     "Confianza": datos_1[1]
                                 })
-            for mensaje in self.__mensajes:
-                frame_1['Mensaje'] = mensaje
+            frame_1['Mensaje']= self.__mensajes
             #frame 2, codigo del chat, con promedio respectivo
             frame_2= pd.DataFrame({
                                     "Codigo_Chat" : [self.__codigo],
@@ -70,3 +70,12 @@ class EstadoDelChat:
 
             except Exception as e:
                 return print(f'No se pudo almacenar los datos en el csv {e}')
+
+# chat_worker = EstadoDelChat(3324)
+# chat_worker.agregar_mensaje('no me gusta nada')
+# chat_worker.agregar_mensaje('no me gusta nada')
+# chat_worker.agregar_mensaje('no me gusta nada')
+# chat_worker.agregar_mensaje('no me gusta nada')
+# chat_worker.agregar_mensaje('no me gusta nada')
+
+# chat_worker.devolucion()

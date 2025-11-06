@@ -59,7 +59,6 @@ def welcome_message(message: telebot.types.Message):
     )
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
-<<<<<<< Updated upstream
 # @bot.message_handler(commands=["sentimiento"])
 # def cmd_sentimiento(message):
 #     texto = message.text
@@ -69,18 +68,6 @@ def welcome_message(message: telebot.types.Message):
 #     frase = texto.split(" ", 1)[1].strip('"')
 #     resultado = analizador_sentimiento(frase)
 #     bot.reply_to(message, resultado)
-=======
-
-@bot.message_handler(commands=["sentimiento"])
-def cmd_sentimiento(message):
-    texto = message.text
-    if len(texto.split(" ", 1)) < 2:
-        bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
-        return
-    frase = texto.split(" ", 1)[1].strip('"')
-    resultado = analizador_sentimiento(frase)
-    bot.reply_to(message, resultado)
->>>>>>> Stashed changes
 
 @bot.message_handler(commands=["crear"])
 def cmd_crear_carpeta(message):
@@ -221,10 +208,6 @@ def handle_voice_message(message: telebot.types.Message):
     response = get_groq_response(transcription, bank_data)
     bot.reply_to(message, response or "Error al procesar tu consulta.")
 
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
