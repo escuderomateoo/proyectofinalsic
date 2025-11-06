@@ -37,31 +37,36 @@ class EstadoDelChat:
         return  notas, confianzas, promedio_notas,promedio_confianzas
 
     def devolucion(self):
-        #Frame 1 de notas y la confianzas respectivas, con el codigo del chat
-        datos_1 = self.analizar_mensajes()
-        frame_1 = pd.DataFrame({
-                                "Codigo_Chat" : [self.__codigo]*len(datos_1[0]),
-                                "Nota": datos_1[0],
-                                "Confianza": datos_1[1]
-                            })
-        #frame 2, codigo del chat, con promedio respectivo
-        frame_2= pd.DataFrame({
-                                "Codigo_Chat" : [self.__codigo],
-                                "Nota_Mean" : [datos_1[2]],
-                                "Confianza_Mean" : [datos_1[3]]
-                            })
-        try:
-            #Almacenamiento en el archivo "mensajes_mean.csv"
-            datos_entrada = pd.read_csv("mensajes_mean.csv")
-            df_total = pd.concat([datos_entrada, frame_2], ignore_index=True)
-            df_total = df_total.sort_values(by=df_total.columns[0])
-            df_total.to_csv("mensajes_mean.csv",index=False)
+        if len(self.__mensajes)<=5:
+            return None
+        else:
+            #Frame 1 de notas y la confianzas respectivas, con el codigo del chat
+            datos_1 = self.analizar_mensajes()
+            frame_1 = pd.DataFrame({
+                                    "Codigo_Chat" : [self.__codigo]*len(datos_1[0]),
+                                    "Nota": datos_1[0],
+                                    "Confianza": datos_1[1]
+                                })
+            for mensaje in self.__mensajes:
+                frame_1['Mensaje'] = mensaje
+            #frame 2, codigo del chat, con promedio respectivo
+            frame_2= pd.DataFrame({
+                                    "Codigo_Chat" : [self.__codigo],
+                                    "Nota_Mean" : [datos_1[2]],
+                                    "Confianza_Mean" : [datos_1[3]]
+                                })
+            try:    
+                #Almacenamiento en el archivo "mensajes_mean.csv"
+                datos_entrada = pd.read_csv("mensajes_mean.csv")
+                df_total = pd.concat([datos_entrada, frame_2], ignore_index=True)
+                df_total = df_total.sort_values(by=df_total.columns[0])
+                df_total.to_csv("mensajes_mean.csv",index=False)
 
-            #Almacenamiento en el archvio "mensajes.csv"
-            datos_entrada = pd.read_csv('mensajes.csv')
-            df_total = pd.concat([datos_entrada,frame_1],ignore_index=True)
-            df_total = df_total.sort_values(by=df_total.columns[0])
-            df_total.to_csv('mensajes.csv',index=False)
+                #Almacenamiento en el archvio "mensajes.csv"
+                datos_entrada = pd.read_csv('mensajes.csv')
+                df_total = pd.concat([datos_entrada,frame_1],ignore_index=True)
+                df_total = df_total.sort_values(by=df_total.columns[0])
+                df_total.to_csv('mensajes.csv',index=False)
 
-        except Exception as e:
-            return print(f'No se pudo almacenar los datos en el csv {e}')
+            except Exception as e:
+                return print(f'No se pudo almacenar los datos en el csv {e}')

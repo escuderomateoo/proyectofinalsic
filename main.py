@@ -56,7 +56,6 @@ def welcome_message(message: telebot.types.Message):
     )
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
-
 # @bot.message_handler(commands=["sentimiento"])
 # def cmd_sentimiento(message):
 #     texto = message.text
@@ -66,7 +65,6 @@ def welcome_message(message: telebot.types.Message):
 #     frase = texto.split(" ", 1)[1].strip('"')
 #     resultado = analizador_sentimiento(frase)
 #     bot.reply_to(message, resultado)
-
 
 @bot.message_handler(commands=["crear"])
 def cmd_crear_carpeta(message):
@@ -89,7 +87,6 @@ def cmd_crear_carpeta(message):
     resultado = crear_carpeta(nombre, dinero)
     bot.reply_to(message, resultado)
 
-
 @bot.message_handler(commands=["gasto"])
 def cmd_ver_gasto(message):
     partes = message.text.split()
@@ -100,7 +97,6 @@ def cmd_ver_gasto(message):
     nombre = partes[1]
     resultado = ver_gasto(nombre)
     bot.reply_to(message, resultado)
-
 
 @bot.message_handler(commands=["resumen", "resumen_gastos"])
 def cmd_resumen(message):
@@ -126,7 +122,6 @@ def cmd_resumen(message):
     lineas.append(f"\nTotal: ${total:.2f}")
     mensaje = "Resumen de carpetas:\n" + "\n".join(lineas)
     bot.reply_to(message, mensaje)
-
 
 @bot.message_handler(commands=["depositar"])
 def cmd_depositar(message):
@@ -241,8 +236,6 @@ def handle_voice_message(message: telebot.types.Message):
     response = get_groq_response(transcription, bank_data)
     bot.reply_to(message, response or "Error al procesar tu consulta.")
 
-
-
 @bot.message_handler(content_types=["photo"])
 def handle_foto(message):
     try:
@@ -297,10 +290,7 @@ def handle_foto(message):
     except Exception as e:
         bot.reply_to(message, f"❌ Error al procesar la imagen: {str(e)}")
 
-
-
 # CALLBACKS DE BOTONES
-
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_query(call):
@@ -309,10 +299,7 @@ def callback_query(call):
     bot.send_chat_action(call.message.chat.id, "typing")
     bot.send_message(call.message.chat.id, respuesta)
 
-
-
 # MAIN LOOP
-
 
 if __name__ == "__main__":
     if bank_data:
