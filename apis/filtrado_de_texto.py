@@ -4,35 +4,8 @@ import nltk
 from nltk.corpus import stopwords
 
 
-## Manejo seguro de stopwords: intentamos usar nltk, pero si falla usamos un fallback
-def _load_stopwords():
-    try:
-        # Intentar acceder a las stopwords; si faltan se lanzará LookupError
-        stopwords.words("spanish")
-    except Exception:
-        try:
-            nltk.download("stopwords")
-        except Exception:
-            # Si la descarga falla (sin red o permisos), continuamos y usaremos fallback
-            pass
-
-    try:
-        return set(stopwords.words("spanish"))
-    except Exception:
-        # Fallback mínimo de stopwords en español para evitar crashes
-        return set([
-            "de","la","que","el","en","y","a","los","del","se","las","por",
-            "un","para","con","no","una","su","al","lo","como","más","pero",
-            "sus","le","ya","o","este","sí","porque","esta","entre","cuando",
-            "muy","sin","sobre","también","me","hasta","hay","donde","quien",
-            "desde","todo","nos","durante","todos","uno","les","ni","contra",
-            "otros","fue","ese","eso","había","ante","ellos","e","esto","mí",
-            "antes","algunos","qué","unos","yo","otro","otras","otra","él"
-        ])
-
-
-# Cargamos STOPWORDS_ES una sola vez al importar el módulo
-STOPWORDS_ES = _load_stopwords()
+##Funciones Para Filtrar el texto ingresado, para así el bot "piense" menos
+nltk.download("stopwords")
 
 
 def limpiar_texto(texto: str) -> str:
@@ -88,7 +61,7 @@ def eliminar_stopwords(texto: str) -> str:
     Returns:
         texto_arreglado(str):   linea de texto en formato str sin stopwords
     """
-    stopwords_es = STOPWORDS_ES
+    stopwords_es = set(stopwords.words("spanish"))  # Set de stopwords en Español
 
     palabras = texto.split()
     filtrado = [

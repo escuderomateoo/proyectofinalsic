@@ -63,7 +63,10 @@ Luego, en Telegram, buscá tu bot y enviá:
     * Aumentar la velocidad de respuesta.
     * Disminuir errores.
 
-   
+    -Procesamiento de Audio:
+    * Envía un mensaje de voz y el bot responderá. 
+    * El bot puede escuchar el audio del usuario, transcribirlo a texto y luego procesar esa consulta como lo haría con cualquier mensaje de texto para generar una respuesta relevante y conversacional.
+
     -Gestión de gastos (por categoría)
     * /crear nombre dinero_inicial → Crea una categoría con el nombre y monto inicial especificado.
     * /depositar destino monto → Suma `monto` a la categoría `destino`.
