@@ -1,19 +1,5 @@
 {
-    "escuela": {
-        "dinero": 1096.0
-    },
-    "celular": {
-        "dinero": 5.0
-    },
-    "hobbies": {
-        "dinero": 100.0
-    },
-    "facultad": {
-        "dinero": 100.0
-    "colectivo": {
-        "dinero": 10.0
-    },
-    "futbol": {
-        "dinero": 130.0
+    "hostDeBot": {
+        "dinero": 14400.0
     }
 }
