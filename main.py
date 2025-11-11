@@ -60,15 +60,15 @@ def welcome_message(message: telebot.types.Message):
     )
     bot.send_message(message.chat.id, "Preguntas frecuentes:", reply_markup=markup)
 
-# @bot.message_handler(commands=["sentimiento"])
-# def cmd_sentimiento(message):
-#     texto = message.text
-#     if len(texto.split(" ", 1)) < 2:
-#         bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
-#         return
-#     frase = texto.split(" ", 1)[1].strip('"')
-#     resultado = analizador_sentimiento(frase)
-#     bot.reply_to(message, resultado)
+@bot.message_handler(commands=["sentimiento"])
+def cmd_sentimiento(message):
+     texto = message.text
+     if len(texto.split(" ", 1)) < 2:
+         bot.reply_to(message, 'Usa: /sentimiento "tu frase"')
+         return
+     frase = texto.split(" ", 1)[1].strip('"')
+     resultado = analizador_sentimiento(frase)
+     bot.reply_to(message, resultado)
 
 @bot.message_handler(commands=["crear"])
 def cmd_crear_carpeta(message):
