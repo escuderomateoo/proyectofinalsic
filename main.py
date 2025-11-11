@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import time
 import telebot
 import json
@@ -48,11 +49,13 @@ def welcome_message(message: telebot.types.Message):
     markup = telebot.types.InlineKeyboardMarkup()
     markup.row_width = 2
     for preguntas in bank_data["faqs"]:
-        markup.add(
-            telebot.types.InlineKeyboardButton(
-                preguntas["question"], callback_data=preguntas["question"]
+        num = np.random.randint(0,2)
+        if num==0:
+            markup.add(
+                telebot.types.InlineKeyboardButton(
+                    preguntas["question"], callback_data=preguntas["question"]
+                )
             )
-        )
     bot.reply_to(
         message,
         "💰 ¡Hola! Soy el bot informativo sobre bancos en Argentina.\n"
