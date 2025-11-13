@@ -16,7 +16,7 @@
   **2-Creá y activá un entorno virtual (recomendado):**
    
     python -m venv entorno_bot
-    entorno_bot\Scripts\activate   # En Windows
+    source entorno_bot/Scripts/activate   # En Windows
 
   **3-Instalá las dependencias:**
     
@@ -106,6 +106,51 @@ Luego, en Telegram, buscá tu bot y enviá:
 
     mensajes.csv → contiene cada mensaje con su puntuación individual.
     mensajes_mean.csv → resume el promedio de sentimiento por cada chat.
+
+##
+      🖥️ Configuración del VPS y entorno
+
+      Se alquiló un VPS económico en DonWeb, donde se instaló Ubuntu como sistema operativo base y Python 3.11.10 como entorno principal de ejecución.
+      El servidor funciona como entorno centralizado para correr y administrar los bots del proyecto.
+
+      ⚙️ Ejecución continua
+
+      Para asegurar un funcionamiento 24/7, se configuró PM2 como gestor de procesos.
+      PM2 mantiene ambos bots activos de forma permanente, los reinicia automáticamente si ocurre algún fallo y los lanza nuevamente cada vez que se reinicia el VPS.
+
+      🤖 Estructura del proyecto
+
+      El sistema está compuesto por dos bots:
+
+      BanksRate → Bot principal encargado de las tareas automatizadas del proyecto.
+
+      BotAdmin → Bot de administración que controla a BanksRate y supervisa su estado.
+
+      🧩 Funcionalidades del BotAdmin
+
+      🔌 Encender o apagar el bot BanksRate remotamente.
+
+      🔄 Actualizar el bot principal con las últimas versiones del repositorio (pull automático).
+
+      📊 Ver el estado de BanksRate y del propio BotAdmin, mostrando información y logs en tiempo real.
+
+      🤖 Creación del BotAdmin en Telegram
+
+      Como BotAdmin es un bot independiente, debe tener su propio bot y API key de Telegram:
+
+      Abre Telegram y busca el usuario @BotFather.
+
+      Usa el comando /newbot para crear un nuevo bot.
+
+      Asigna un nombre y un username único (por ejemplo, BanksRateAdminBot).
+
+      BotFather te entregará un token de acceso (API Key), que deberás copiar y pegar en la configuración del BotAdmin (por ejemplo, en un archivo .env o variable de entorno).
+
+      ⚠️ Es importante no reutilizar el mismo token que el bot BanksRate, ya que el BotAdmin funciona como un servicio separado que controla al otro bot.
+
+      Con esta configuración, el VPS mantiene ambos bots activos permanentemente, gestionados y actualizados de forma remota mediante Telegram.
+      ﻿
+
 
 ## 👨‍💻 Desarrolladores y Agradecimientos
 
