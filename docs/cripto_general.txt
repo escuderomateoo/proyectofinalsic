@@ -1,0 +1,52 @@
+CRIPTOMONEDAS — GUÍA GENERAL
+
+¿Qué es Ethereum?
+Ethereum es una blockchain programable creada en 2015 por Vitalik Buterin. A diferencia de Bitcoin, que está diseñado principalmente como moneda, Ethereum permite ejecutar smart contracts: programas que corren automáticamente en la blockchain sin intermediarios. Es la plataforma base de la mayor parte del ecosistema DeFi y NFTs. Su moneda nativa es el Ether (ETH).
+
+¿Qué son los smart contracts?
+Los smart contracts son programas almacenados en la blockchain que se ejecutan automáticamente cuando se cumplen ciertas condiciones. Por ejemplo: un contrato que libera un pago cuando se confirma la entrega de un producto. No requieren intermediarios como bancos o escribanos. Una vez desplegados en la blockchain, no pueden modificarse.
+
+¿Qué es el proof of stake?
+El proof of stake (PoS) es un mecanismo de consenso alternativo al proof of work de Bitcoin. En lugar de mineros que compiten con poder de cómputo, los validadores depositan (stakean) criptomonedas como garantía. Si intentan hacer trampa, pierden su stake. Ethereum migró de proof of work a proof of stake en 2022 (The Merge), reduciendo su consumo de energía en un 99.9%.
+
+¿Qué es el staking?
+El staking consiste en bloquear criptomonedas en un protocolo para participar en la validación de transacciones y recibir recompensas a cambio. Es similar a un plazo fijo: inmovilizás fondos por un período y recibís rendimiento. Los exchanges como Binance, Lemon y Ripio ofrecen staking simplificado donde el usuario no necesita ser validador directamente.
+
+¿Qué es DeFi?
+DeFi (Decentralized Finance) son aplicaciones financieras que funcionan sobre blockchains, principalmente Ethereum, sin intermediarios centralizados. Incluyen: exchanges descentralizados (DEX) como Uniswap, protocolos de préstamos como Aave y Compound, y yield farming. Los usuarios mantienen custodia de sus fondos en todo momento mediante wallets propias.
+
+¿Qué son los NFTs?
+Los NFTs (Non-Fungible Tokens) son tokens únicos en la blockchain que representan la propiedad de un activo digital o físico. A diferencia de las criptomonedas, cada NFT es único e irrepetible. Tuvieron un boom en 2021-2022, especialmente en arte digital y coleccionables. Su mercado colapsó significativamente en 2022-2023.
+
+¿Qué son las stablecoins?
+Las stablecoins son criptomonedas diseñadas para mantener un valor estable, generalmente anclado al dólar estadounidense. Las más populares son USDT (Tether) y USDC. Se usan para protegerse de la volatilidad del mercado cripto sin salir del ecosistema. En Argentina son muy populares para dolarizarse de forma alternativa.
+
+¿Qué es Solana?
+Solana (SOL) es una blockchain de alta velocidad capaz de procesar miles de transacciones por segundo a comisiones muy bajas. Es uno de los principales competidores de Ethereum. Tiene un ecosistema activo de DeFi y NFTs. Sufrió varios episodios de red caída en su historia, lo que es una crítica frecuente a su centralización relativa.
+
+¿Qué es BNB y Binance Smart Chain?
+BNB es el token nativo de Binance, el exchange más grande del mundo. Binance Smart Chain (ahora BNB Chain) es una blockchain paralela compatible con Ethereum que ofrece comisiones más bajas. Se usa en DeFi y en los productos del ecosistema Binance. BNB sirve para pagar comisiones en el exchange con descuento.
+
+¿Qué es XRP (Ripple)?
+XRP es la criptomoneda de Ripple, una empresa que desarrolla soluciones de pagos internacionales para bancos. A diferencia de Bitcoin, XRP tiene una empresa detrás y es más centralizado. Es rápido y barato para transferencias internacionales. Tuvo una larga batalla legal con la SEC de Estados Unidos que concluyó parcialmente en 2023.
+
+¿Qué es Cardano?
+Cardano (ADA) es una blockchain con enfoque académico y científico, desarrollada por Charles Hoskinson (cofundador de Ethereum). Usa proof of stake y tiene reputación de desarrollo lento pero riguroso. Su ecosistema DeFi es más pequeño que Ethereum o Solana.
+
+¿Qué es Dogecoin?
+Dogecoin (DOGE) nació en 2013 como una broma basada en un meme de internet. Sin embargo, tiene una comunidad activa y fue popularizado por Elon Musk en redes sociales en 2021, lo que disparó su precio. No tiene utilidad técnica especial ni suministro limitado.
+
+¿Qué es un exchange de criptomonedas?
+Un exchange (o casa de cambio cripto) es una plataforma donde se compran y venden criptomonedas. Los exchanges centralizados (CEX) como Binance, Coinbase o Lemon actúan como intermediarios y custodian los fondos del usuario. Los exchanges descentralizados (DEX) como Uniswap permiten intercambios directos entre wallets sin custodiar fondos.
+
+¿Qué es el market cap de una criptomoneda?
+El market cap (capitalización de mercado) es el precio actual multiplicado por la cantidad de tokens en circulación. Indica el tamaño relativo de una criptomoneda. Bitcoin tiene el mayor market cap del mercado cripto (dominance de 50-60%). Se usa para comparar criptomonedas independientemente de su precio unitario.
+
+¿Qué son las gas fees?
+Las gas fees son las comisiones que se pagan en Ethereum para ejecutar transacciones o smart contracts. Se pagan en ETH y varían según la congestión de la red. En momentos de alta actividad pueden ser muy caras. Esto es una de las razones por las que existen blockchains alternativas como Solana o BNB Chain con comisiones más bajas.
+
+¿Qué es un airdrop?
+Un airdrop es la distribución gratuita de tokens a wallets que cumplen ciertos criterios. Las empresas los usan para promover nuevos proyectos o recompensar a usuarios existentes. Muchos scams utilizan la promesa de airdrops falsos para robar claves privadas.
+
+¿Qué es un rugpull?
+Un rugpull es una estafa en la que los creadores de un proyecto cripto lo abandonan repentinamente y huyen con los fondos de los inversores. Son comunes en proyectos DeFi y NFTs de bajo perfil. Para evitarlos, es importante verificar si el código del proyecto fue auditado y si el equipo es público y verificable.

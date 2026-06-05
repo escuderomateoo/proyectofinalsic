@@ -1,0 +1,70 @@
+GLOSARIO FINANCIERO — TÉRMINOS BANCARIOS Y CRIPTO EN ARGENTINA
+
+TNA (Tasa Nominal Anual)
+La TNA es la tasa de interés anual expresada de forma nominal, sin tener en cuenta el efecto de la capitalización. Es el porcentaje que el banco te paga por año en un plazo fijo o te cobra por año en un préstamo. Por ejemplo, una TNA del 97% significa que en un año tu capital crece un 97% antes de impuestos, asumiendo que no se capitaliza el interés.
+
+TEA (Tasa Efectiva Anual)
+La TEA refleja el rendimiento real considerando la capitalización de intereses. Si el plazo fijo capitaliza mensualmente, la TEA será mayor que la TNA. La TEA permite comparar productos financieros en igualdad de condiciones. Fórmula: TEA = (1 + TNA/365)^365 - 1 para capitalización diaria.
+
+TEM (Tasa Efectiva Mensual)
+La TEM es el porcentaje de interés mensual efectivo. Se obtiene dividiendo aproximadamente la TNA entre 12. Es útil para calcular el crecimiento mes a mes de una inversión o el costo mensual de un préstamo.
+
+CFT (Costo Financiero Total)
+El CFT incluye todos los costos de un crédito: tasa de interés, seguros, comisiones y gastos administrativos. Es el indicador más completo para comparar préstamos. Por ley, todos los bancos en Argentina deben informar el CFT claramente en los contratos de crédito.
+
+CBU (Clave Bancaria Uniforme)
+El CBU es un número de 22 dígitos que identifica unívocamente una cuenta bancaria en Argentina. Se usa para transferencias entre bancos. Cada cuenta tiene un CBU único que nunca cambia. Lo otorga el banco al abrir la cuenta.
+
+CVU (Clave Virtual Uniforme)
+El CVU es el equivalente al CBU pero para billeteras virtuales (fintech) como Mercado Pago, Ualá, Naranja X, Lemon, etc. También tiene 22 dígitos y permite recibir transferencias desde cuentas bancarias tradicionales hacia billeteras digitales.
+
+Alias CBU/CVU
+El alias es un nombre de texto que reemplaza al CBU o CVU para facilitar las transferencias. Por ejemplo, en lugar de memorizar 22 dígitos, podés usar "NOMBRE.APELLIDO.BANCO". Puede personalizarse desde el home banking o la app de la billetera.
+
+Cuenta corriente
+La cuenta corriente permite operar con cheques y tener saldo en descubierto (adelantos). Suele tener costo de mantenimiento más alto que la caja de ahorro. Está orientada principalmente a empresas y profesionales que necesitan emitir cheques.
+
+Caja de ahorro
+La caja de ahorro es la cuenta bancaria básica para personas físicas. Permite depósitos, extracciones, transferencias y uso de tarjeta de débito. En Argentina, por ley, la caja de ahorro en pesos debe ser gratuita si el titular acredita su sueldo o jubilación en esa cuenta.
+
+Tarjeta de débito
+La tarjeta de débito descuenta el dinero directamente de la cuenta bancaria en el momento de la compra. No genera deuda ni intereses. En Argentina el pago con débito tiene beneficios impositivos (devolución de IVA del 15% en compras con ciertas condiciones).
+
+Tarjeta de crédito
+La tarjeta de crédito permite comprar con dinero prestado que se devuelve en cuotas o al cierre del resumen mensual. Si se paga el total del resumen antes del vencimiento, no genera intereses. Si se paga solo el mínimo, los intereses son muy altos (usualmente entre 120% y 200% TNA en Argentina).
+
+Plazo fijo tradicional
+El plazo fijo es una inversión donde inmovilizás dinero en el banco por un plazo determinado (mínimo 30 días en Argentina) a cambio de una tasa de interés pactada. Al vencimiento recibís el capital más los intereses. Es la inversión más simple y segura en Argentina, aunque en contextos de alta inflación puede rendir por debajo de la suba de precios.
+
+Plazo fijo UVA
+El plazo fijo UVA (Unidad de Valor Adquisitivo) ajusta el capital por inflación. A diferencia del plazo fijo tradicional, el rendimiento está atado al CER (Coeficiente de Estabilización de Referencia), que sigue al IPC. Requiere un plazo mínimo de 90 días. Ideal para preservar el poder adquisitivo en contextos inflacionarios.
+
+Fondo común de inversión (FCI)
+Los FCI son instrumentos donde muchos inversores juntan dinero y un gestor profesional lo invierte en una cartera de activos (bonos, acciones, plazos fijos). Permiten diversificar con montos pequeños. Los FCI money market invierten en activos de muy corto plazo y son casi tan líquidos como una caja de ahorro con mejor rendimiento.
+
+IPC (Índice de Precios al Consumidor)
+El IPC mide la variación de precios de una canasta de bienes y servicios representativa del consumo de los hogares. Es el indicador oficial de inflación en Argentina, publicado mensualmente por el INDEC. Una inflación alta del IPC deteriora el poder adquisitivo del peso argentino.
+
+AFIP (Administración Federal de Ingresos Públicos)
+La AFIP es el organismo recaudador de impuestos en Argentina (actualmente renombrado ARCA). Regula el cumplimiento tributario de personas físicas y empresas. Exige la declaración de criptomonedas en bienes personales y puede gravar las ganancias obtenidas por su compraventa.
+
+BCRA (Banco Central de la República Argentina)
+El BCRA es el banco central de Argentina. Regula el sistema financiero, establece la política monetaria, fija tasas de interés de referencia y administra las reservas internacionales. También establece las regulaciones sobre compra de divisas (dólar) y su relación con las criptomonedas.
+
+Wallet cripto (billetera de criptomonedas)
+Una wallet cripto es una aplicación que gestiona las claves criptográficas necesarias para acceder a criptomonedas en la blockchain. Las wallets custodiales (exchanges) guardan las claves en nombre del usuario. Las wallets no custodiales (MetaMask, Trust Wallet, Ledger) dan control total al usuario. "Not your keys, not your coins."
+
+Private key (clave privada)
+La clave privada es una cadena de caracteres que permite firmar transacciones y probar la propiedad de fondos en una blockchain. Si alguien obtiene tu clave privada, tiene acceso total a tus criptomonedas. Nunca debe compartirse con nadie ni ingresarse en sitios web no verificados.
+
+Seed phrase (frase semilla)
+La seed phrase es una secuencia de 12 o 24 palabras aleatorias que representa la clave maestra de una wallet. Permite recuperar todos los fondos de una wallet si el dispositivo se pierde o rompe. Debe guardarse en papel o metal, nunca en formato digital ni en fotos. Perder la seed phrase significa perder acceso permanente a los fondos.
+
+Hash rate
+El hash rate mide el poder computacional total de la red de minería de una criptomoneda como Bitcoin. Se expresa en hashes por segundo (EH/s para exahashes). Un hash rate más alto significa una red más segura y difícil de atacar.
+
+DeFi (Finanzas Descentralizadas)
+DeFi engloba aplicaciones financieras que funcionan sobre blockchains sin intermediarios centralizados. Incluye préstamos, intercambios, yield farming y seguros descentralizados. Los usuarios interactúan directamente mediante wallets propias. Tiene mayor riesgo que las finanzas tradicionales por bugs en smart contracts y volatilidad de activos.
+
+Exchange CEX vs DEX
+Un CEX (Centralized Exchange) es un exchange centralizado donde una empresa actúa como intermediaria y custodia los fondos (Binance, Lemon, Ripio). Un DEX (Decentralized Exchange) permite intercambiar tokens directamente entre wallets sin custodio (Uniswap, PancakeSwap). Los CEX son más fáciles de usar pero implican confiar en la empresa.

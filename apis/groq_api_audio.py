@@ -1,17 +1,14 @@
-import os
-from dotenv import load_dotenv
+import logging
 from groq import Groq
 from typing import Optional
+from config import GROQ_API_KEY
 from apis.groq_api_texto import system_prompt
 
-# Cargar variables del entorno
-load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+logger = logging.getLogger(__name__)
 
 if not GROQ_API_KEY:
     raise ValueError("No se encuentra la API_KEY de Groq")
 
-# Inicializar cliente Groq
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 
@@ -27,5 +24,5 @@ def transcribe_voice_with_groq(file_path: str) -> Optional[str]:
             )
         return transcription.text
     except Exception as e:
-        print(f"Error al transcribir el audio: {str(e)}")
+        logger.error("Error al transcribir audio: %s", e)
         return None

@@ -21,6 +21,12 @@ Thumbs.db
 # Archivos de logs
 *.log
 
+# Base de datos runtime
+bot_data.db
+
+# Archivos de voz temporales
+temp_voice_*.ogg
+
 # Configuración o variables secretas
 *.env
 *.token

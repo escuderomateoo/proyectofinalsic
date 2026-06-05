@@ -1,0 +1,46 @@
+CRIPTOMONEDAS EN ARGENTINA — GUÍA PRÁCTICA
+
+¿Cómo comprar criptomonedas en Argentina?
+En Argentina podés comprar criptomonedas a través de exchanges locales regulados o plataformas internacionales. Los principales exchanges locales son Lemon Cash, Ripio, Bitso, Belo y Buenbit. Las plataformas internacionales más usadas son Binance y Coinbase. Para registrarte necesitás CUIL/CUIT, DNI y a veces selfie con documento para verificación de identidad (KYC).
+
+Exchanges locales en Argentina
+Lemon Cash: permite comprar cripto, tener tarjeta de débito que gasta en pesos pero descuenta en cripto, y ofrece rendimiento en USDT. Ripio: uno de los más antiguos en Argentina, permite comprar BTC, ETH y otras monedas con pesos. Buenbit: orientado a ahorro en stablecoins, ofrece rendimiento diario en USDT. Bitso: exchange mexicano con fuerte presencia en Argentina, buenas comisiones. Belo: similar a Lemon, con tarjeta prepaga y rendimiento en cripto.
+
+¿Cómo pagar criptomonedas en Argentina?
+Varias plataformas ofrecen tarjetas de débito o prepago que permiten pagar en comercios en pesos usando el saldo en criptomonedas. Lemon Cash tiene su tarjeta Visa que convierte cripto a pesos al momento del pago. Algunos comercios ya aceptan pagos directos en cripto. También es posible hacer transferencias entre wallets para pagos entre particulares.
+
+¿Cómo tributan las criptomonedas en Argentina?
+Las criptomonedas en Argentina son consideradas activos digitales por la AFIP (ahora ARCA). Deben declararse en el Impuesto a los Bienes Personales si el total de activos supera el mínimo no imponible. Las ganancias obtenidas por la compraventa de criptomonedas pueden estar alcanzadas por el Impuesto a las Ganancias. Los exchanges locales informan datos a la AFIP mediante régimen de información.
+
+El dólar cripto en Argentina
+El dólar cripto (también llamado dólar crypto o CCL crypto) es una cotización del dólar obtenida mediante la compra de stablecoins (USDT) con pesos en exchanges locales. Refleja el precio real de mercado del dólar en Argentina sin restricciones. Suele cotizar cerca del dólar MEP y el dólar blue. Es una alternativa legal para dolarizarse sin los límites del mercado oficial.
+
+¿Por qué los argentinos usan stablecoins?
+Argentina tiene una inflación histórica muy alta y restricciones para comprar dólares oficiales. Las stablecoins como USDT permiten mantener ahorros en dólares digitales sin necesidad de una cuenta bancaria en el exterior. Son accesibles, instantáneas y sin límite de monto (sujeto a las reglas de cada exchange). Muchos argentinos usan USDT como refugio ante la devaluación del peso.
+
+El cepo cambiario y las criptomonedas
+El cepo cambiario es el conjunto de restricciones que limita la compra de dólares en Argentina. Con el cepo, los particulares pueden comprar hasta USD 200 mensuales al tipo de cambio oficial. Las criptomonedas no están sujetas a este límite, por lo que son usadas como alternativa para dolarizar ahorros sin restricciones. El BCRA ha intentado en distintos momentos regular esta operatoria.
+
+¿Qué es el dólar MEP con criptomonedas?
+El dólar MEP (Mercado Electrónico de Pagos) tradicional se opera con bonos en el mercado de capitales. Con criptomonedas, un mecanismo similar permite comprar USDT con pesos argentinos a un precio cercano al MEP. No requiere abrir una cuenta de inversiones y es accesible desde cualquier exchange local. La brecha entre el dólar oficial y el dólar cripto suele estar entre 0% y 5%.
+
+Comisiones en exchanges argentinos
+Cada exchange cobra comisiones distintas por comprar, vender y retirar cripto. En general las comisiones de trading oscilan entre 0.1% y 1% por operación. Ripio cobra alrededor de 1%. Lemon tiene comisiones variables según el par. Binance cobra 0.1% estándar con descuento adicional si se paga con BNB. Siempre verificar las comisiones actuales en el sitio oficial.
+
+¿Es seguro guardar criptomonedas en un exchange?
+Guardar cripto en un exchange (custodia de terceros) implica confiar en que la empresa no quiebre, sea hackeada o realice prácticas fraudulentas. El colapso de FTX en 2022 dejó a miles de usuarios sin fondos. Para montos significativos se recomienda usar wallets propias (no custodiales) como MetaMask, Trust Wallet o hardware wallets como Ledger. Para uso cotidiano, los exchanges locales regulados son convenientes.
+
+¿Qué es el P2P trading?
+El trading P2P (peer to peer) permite comprar y vender criptomonedas directamente entre personas sin intermediario central. En plataformas como Binance P2P, los usuarios publican órdenes de compra o venta con distintos métodos de pago (transferencia bancaria, efectivo, Mercado Pago). El exchange actúa como garantía bloqueando los fondos en custodia durante la operación.
+
+Riesgos comunes de las criptomonedas en Argentina
+Los principales riesgos son: volatilidad extrema de precios, pérdida de claves privadas o seed phrase, scams y phishing, exchanges que quiebran o son hackeados, regulación cambiante, y proyectos fraudulentos (rugpulls). Argentina suma el riesgo adicional de la brecha cambiaria que puede cambiar el valor efectivo en pesos abruptamente.
+
+¿Qué es el Bitcoin como reserva de valor?
+Muchos argentinos ven a Bitcoin como una reserva de valor similar al oro o al dólar, pero digital. Con emisión limitada a 21 millones de monedas y sin posibilidad de que ningún gobierno la devalúe, Bitcoin protege contra la inflación en el largo plazo. Sin embargo, su volatilidad en el corto plazo lo hace riesgoso como reserva de valor para plazos cortos.
+
+¿Cómo funciona el retiro de cripto a pesos en Argentina?
+Para convertir criptomonedas a pesos, vendés en el exchange local y transferís a tu cuenta bancaria. El proceso suele demorar entre minutos y 24 horas hábiles. Algunos exchanges como Lemon permiten gastar directamente con tarjeta sin convertir a pesos. La operación puede estar sujeta a impuestos según el monto y la ganancia obtenida.
+
+Regulación cripto en Argentina
+Argentina no tiene una ley específica sobre criptomonedas. El BCRA las excluye del sistema de pagos oficial pero no las prohíbe. La CNV (Comisión Nacional de Valores) regula algunas operaciones de activos digitales. Los exchanges locales que operan legalmente están inscriptos en la UIF (Unidad de Información Financiera) para cumplir normativas antilavado. La regulación cripto en Argentina está en constante evolución.

@@ -1,0 +1,43 @@
+BITCOIN — GUÍA COMPLETA
+
+¿Qué es Bitcoin?
+Bitcoin es una moneda digital descentralizada creada en 2009 por una persona o grupo bajo el seudónimo Satoshi Nakamoto. No está controlada por ningún gobierno, banco central ni empresa. Funciona mediante una red de computadoras distribuidas alrededor del mundo que validan y registran todas las transacciones en un libro contable público llamado blockchain.
+
+¿Cómo funciona la blockchain de Bitcoin?
+La blockchain es una cadena de bloques donde cada bloque contiene un conjunto de transacciones. Una vez que un bloque se agrega a la cadena, no puede modificarse. Cada bloque contiene el hash del bloque anterior, lo que hace que alterar un bloque antiguo requiera recalcular todos los bloques posteriores, algo computacionalmente imposible en la práctica.
+
+¿Qué es la minería de Bitcoin?
+La minería es el proceso mediante el cual los nodos de la red validan transacciones y agregan nuevos bloques a la blockchain. Los mineros compiten para resolver un problema matemático complejo (proof of work). El primero en resolverlo agrega el bloque y recibe como recompensa nuevos bitcoins. Este proceso asegura la red y emite nueva moneda de forma controlada.
+
+¿Cuántos Bitcoin existen?
+El máximo total de Bitcoin que existirá es de 21 millones. Actualmente hay más de 19.7 millones en circulación. Nunca pueden existir más debido a las reglas del protocolo. Esta escasez programada es una de las razones por las que muchos lo consideran una reserva de valor similar al oro.
+
+¿Qué es el halving de Bitcoin?
+El halving ocurre aproximadamente cada 4 años (cada 210.000 bloques). En cada halving, la recompensa por minar un bloque se reduce a la mitad. En 2009 era 50 BTC, en 2012 pasó a 25 BTC, en 2016 a 12.5 BTC, en 2020 a 6.25 BTC, y en 2024 pasó a 3.125 BTC. El halving reduce la emisión de nuevos bitcoins, lo que históricamente ha sido seguido de aumentos de precio.
+
+¿Qué es una wallet de Bitcoin?
+Una wallet (billetera) es una aplicación que almacena las claves privadas necesarias para acceder y mover los bitcoins. No almacena los bitcoins en sí, que siempre están en la blockchain. Existen wallets calientes (hot wallets) conectadas a internet, más cómodas pero menos seguras, y wallets frías (cold wallets o hardware wallets) desconectadas de internet, más seguras para grandes montos.
+
+¿Qué es una clave privada y una clave pública?
+La clave pública es como el número de cuenta bancaria: podés compartirla para recibir Bitcoin. La clave privada es la contraseña que permite firmar y enviar transacciones. Quien tenga tu clave privada tiene control total sobre tus fondos. Por eso nunca debe compartirse. Las frases semilla (seed phrases) son 12 o 24 palabras que permiten recuperar una wallet.
+
+¿Qué es una dirección de Bitcoin?
+Una dirección de Bitcoin es un identificador alfanumérico (ejemplo: 1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf8a) que representa el destino de una transacción. Se genera a partir de la clave pública. Cada transacción queda registrada públicamente en la blockchain y puede verificarse por cualquier persona.
+
+¿Qué es Lightning Network?
+Lightning Network es una capa adicional sobre Bitcoin que permite realizar transacciones instantáneas y con comisiones muy bajas. Funciona abriendo canales de pago entre usuarios fuera de la blockchain principal. Es útil para micropagos y uso cotidiano donde la velocidad y el costo son importantes.
+
+¿Cuáles son los riesgos de Bitcoin?
+Bitcoin es extremadamente volátil. Su precio puede caer 50% o más en períodos cortos. Es irreversible: una transacción enviada no puede cancelarse. No tiene entidad respaldatoria ni seguro de depósito. Es susceptible a scams, phishing y pérdida de claves privadas. Sin embargo, nunca ha sido hackeado a nivel de protocolo en sus 15 años de existencia.
+
+¿Bitcoin es legal en Argentina?
+Sí. En Argentina las criptomonedas son legales. No son moneda de curso legal, pero pueden comprarse, venderse y usarse libremente. La AFIP considera las criptomonedas como activos digitales que deben declararse en bienes personales si el total de activos supera el mínimo no imponible. Las ganancias por compra-venta pueden estar alcanzadas por el impuesto a las ganancias.
+
+¿Qué es el Bitcoin dominance?
+El Bitcoin dominance es el porcentaje de la capitalización de mercado total de criptomonedas que representa Bitcoin. Cuando está alto (sobre 50%), indica que los inversores prefieren Bitcoin sobre altcoins. Cuando baja, suele indicar que el dinero está fluyendo hacia otras criptomonedas (altseason).
+
+¿Cómo se mide el precio de Bitcoin?
+El precio de Bitcoin se determina por la oferta y la demanda en los exchanges. No hay precio oficial único: cada exchange tiene su precio, pero son muy similares por arbitraje. En Argentina, el precio puede variar según el tipo de cambio usado (dólar MEP, oficial, cripto). El precio en pesos argentinos es el precio en USD multiplicado por el tipo de cambio correspondiente.
+
+¿Qué son los satoshis?
+Un satoshi (sat) es la unidad mínima de Bitcoin, equivalente a 0.00000001 BTC. Es decir, 1 BTC = 100.000.000 satoshis. Se usan para hablar de fracciones pequeñas de Bitcoin. Con el precio actual, 1 satoshi equivale a una fracción de centavo de dólar.
