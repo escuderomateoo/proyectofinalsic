@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 
 
 ##Funciones Para Filtrar el texto ingresado, para así el bot "piense" menos
-nltk.download("stopwords")
+nltk.download("stopwords", quiet=True)
 
 
 def limpiar_texto(texto: str) -> str:

@@ -1,29 +1,18 @@
-import pandas as pd
-import os
+import logging
+import db
+
+logger = logging.getLogger(__name__)
 
 
-CSV_FILE = 'comprobantes.csv'
-
-def guardar_comprobante_csv(comprobante_data: dict): 
-    """
-    Guarda los datos del comprobante en un archivo CSV usando Pandas.
-    Si el archivo ya existe, agrega la fila sin borrar los anteriores
-    """
-    #convertir los datos del comprobante a dataframe
-    df_nuevo = pd.DataFrame([comprobante_data])
-
-    #si el archivo existe, se agregan los nuevo datos
-
-    if os.path.isfile(CSV_FILE):
-        df_existente = pd.read_csv(CSV_FILE)
-        df_final = pd.concat([df_existente, df_nuevo], ignore_index=True)
-    else:
-        df_final = df_nuevo
-
-    #guardar el CSV actualizado
-    df_final.to_csv(CSV_FILE, index=False, encoding='utf-8-sig')
-
-    
-
-
-
+def guardar_comprobante_csv(comprobante_data: dict) -> None:
+    try:
+        db.guardar_comprobante(
+            monto=str(comprobante_data.get("Monto", "")),
+            fecha_hora=str(comprobante_data.get("Fecha y hora", "")),
+            numero_operacion=str(comprobante_data.get("Número de operación", "")),
+            remitente=str(comprobante_data.get("Nombre, CUIT/CUIL y CVU del remitente", "")),
+            destinatario=str(comprobante_data.get("Nombre, CUIT/CUIL y CVU del destinatario", "")),
+        )
+        logger.info("Comprobante guardado en DB.")
+    except Exception as e:
+        logger.error("Error guardando comprobante: %s", e)

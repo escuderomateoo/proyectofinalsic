@@ -1,81 +1,61 @@
-from transformers import pipeline
-from apis.filtrado_de_texto import filtrar_texto
-import pandas as pd
+import logging
 import numpy as np
+from transformers import pipeline
+import db
+
+logger = logging.getLogger(__name__)
 
 analizador_de_sentimiento = pipeline(
-    "sentiment-analysis", 
-    model="nlptown/bert-base-multilingual-uncased-sentiment"
+    "sentiment-analysis",
+    model="nlptown/bert-base-multilingual-uncased-sentiment",
 )
-print("Modelo de Analisis de Sentimiento cargado con éxito.")
+logger.info("Modelo de análisis de sentimiento cargado.")
 
 
-def analizador_sentimiento(frase):
+def analizador_sentimiento(frase: str) -> tuple[int, float]:
     resultados = analizador_de_sentimiento(frase)[0]
-    sentimiento = int(resultados["label"].split()[0])
+    nota = int(resultados["label"].split()[0])
     confianza = resultados["score"]
-    return sentimiento, confianza
+    return nota, confianza
+
 
 class EstadoDelChat:
-    def __init__(self,codigo):
-        self.__codigo= codigo
-        self.__mensajes=[]
-    
-    def agregar_mensaje(self,mensaje):
-        assert type(mensaje)==str ,'El argumento tiene que ser un str'
+    def __init__(self, codigo: int):
+        self.__codigo = codigo
+        self.__mensajes: list[str] = []
+        self.__saved_count = 0
+        self.__suma_notas = 0.0
+        self.__suma_confianzas = 0.0
+
+    def agregar_mensaje(self, mensaje: str) -> None:
+        assert isinstance(mensaje, str), "El argumento tiene que ser un str"
         self.__mensajes.append(mensaje)
-    
-    def analizar_mensajes(self):
-        notas = []
-        confianzas = []
-        for mensaje in self.__mensajes:
-            resultados = analizador_sentimiento(mensaje)
-            notas.append(resultados[0])
-            confianzas.append(resultados[1])
-        promedio_notas = np.mean(np.array(notas))
-        promedio_confianzas = np.mean(np.array(confianzas))
-        return  notas, confianzas, promedio_notas,promedio_confianzas
 
-    def devolucion(self):
-        if len(self.__mensajes)<5:
-            return print(len(self.__mensajes),self.__mensajes)
-        else:
-            #Frame 1 de notas y la confianzas respectivas, con el codigo del chat
-            datos_1 = self.analizar_mensajes()
-            print(self.__mensajes)
-            frame_1 = pd.DataFrame({
-                                    "Codigo_Chat" : [self.__codigo]*len(datos_1[0]),
-                                    "Nota": datos_1[0],
-                                    "Confianza": datos_1[1]
-                                })
-            frame_1['Mensaje']= self.__mensajes
-            #frame 2, codigo del chat, con promedio respectivo
-            frame_2= pd.DataFrame({
-                                    "Codigo_Chat" : [self.__codigo],
-                                    "Nota_Mean" : [datos_1[2]],
-                                    "Confianza_Mean" : [datos_1[3]]
-                                })
-            try:    
-                #Almacenamiento en el archivo "mensajes_mean.csv"
-                datos_entrada = pd.read_csv("mensajes_mean.csv")
-                df_total = pd.concat([datos_entrada, frame_2], ignore_index=True)
-                df_total = df_total.sort_values(by=df_total.columns[0])
-                df_total.to_csv("mensajes_mean.csv",index=False)
+    def devolucion(self) -> None:
+        total = len(self.__mensajes)
+        if total < 5:
+            return
 
-                #Almacenamiento en el archvio "mensajes.csv"
-                datos_entrada = pd.read_csv('mensajes.csv')
-                df_total = pd.concat([datos_entrada,frame_1],ignore_index=True)
-                df_total = df_total.sort_values(by=df_total.columns[0])
-                df_total.to_csv('mensajes.csv',index=False)
+        new_msgs = self.__mensajes[self.__saved_count:]
+        if not new_msgs:
+            return
 
+        for msg in new_msgs:
+            nota, confianza = analizador_sentimiento(msg)
+            self.__suma_notas += nota
+            self.__suma_confianzas += confianza
+            try:
+                db.guardar_mensaje(self.__codigo, msg, nota, confianza)
             except Exception as e:
-                return print(f'No se pudo almacenar los datos en el csv {e}')
+                logger.error("Error guardando mensaje en DB: %s", e)
 
-# chat_worker = EstadoDelChat(3324)
-# chat_worker.agregar_mensaje('no me gusta nada')
-# chat_worker.agregar_mensaje('no me gusta nada')
-# chat_worker.agregar_mensaje('no me gusta nada')
-# chat_worker.agregar_mensaje('no me gusta nada')
-# chat_worker.agregar_mensaje('no me gusta nada')
+        self.__saved_count = total
+        nota_mean = self.__suma_notas / total
+        confianza_mean = self.__suma_confianzas / total
 
-# chat_worker.devolucion()
+        try:
+            db.guardar_mensajes_mean(self.__codigo, nota_mean, confianza_mean)
+        except Exception as e:
+            logger.error("Error guardando mean en DB: %s", e)
+
+        logger.info("Sentimiento chat %d → mean=%.2f (confianza=%.2f)", self.__codigo, nota_mean, confianza_mean)
