@@ -137,6 +137,31 @@ Luego buscá tu bot en Telegram y enviá `/start` para comenzar.
 
 ---
 
+## 🧠 Cómo funciona el RAG (base de conocimiento)
+
+El bot incorpora un sistema **RAG** (Retrieval-Augmented Generation) para responder preguntas sobre cripto, Bitcoin y conceptos financieros usando documentación propia, en vez de depender solo del conocimiento de entrenamiento del modelo.
+
+> **Importante:** la búsqueda semántica corre con un **modelo LOCAL**, no con Groq. Groq solo se usa al final para redactar la respuesta. No hay API de embeddings externa ni base de datos vectorial: todo vive en memoria.
+
+**¿Qué modelo usa y dónde corre cada cosa?**
+
+| Etapa | Dónde corre | Herramienta |
+|---|---|---|
+| Generar los embeddings (vectores) de los documentos y de la pregunta | **Local** (tu máquina / VPS) | `sentence-transformers` con el modelo `paraphrase-MiniLM-L3-v2` |
+| Buscar los fragmentos más parecidos a la pregunta | **Local** | Similitud de coseno con `numpy` |
+| Redactar la respuesta final usando esos fragmentos | **Groq** (nube) | `llama-3.3-70b-versatile` |
+
+**El flujo paso a paso:**
+
+1. **Al arrancar (`init_rag`)** — el bot lee todos los `.txt` de la carpeta `docs/` (`bitcoin.txt`, `cripto_argentina.txt`, `cripto_general.txt`, `glosario_financiero.txt`), los parte en *chunks* de ~500 caracteres con 80 de solapamiento (cortando de forma "inteligente" en saltos de línea o puntos), y los convierte en vectores con el modelo local. Todo queda indexado en memoria.
+2. **Cuando escribís una pregunta** — `buscar_contexto()` convierte tu pregunta en un vector con el mismo modelo local y la compara contra todos los chunks usando similitud de coseno.
+3. **Filtrado** — se quedan con los **3 fragmentos más relevantes** (`TOP_K = 3`), pero solo si superan un umbral mínimo de parecido (`SIMILARITY_THRESHOLD = 0.28`). Si nada supera el umbral, no inyecta nada (evita meter ruido).
+4. **Inyección en el prompt** — esos fragmentos se agregan al prompt bajo la etiqueta `[CONOCIMIENTO BASE — fragmentos relevantes]`, junto con los datos de mercado en tiempo real si corresponde, y recién ahí se envía todo a Groq para que redacte la respuesta.
+
+**¿Por qué local y no Groq?** Hacer la búsqueda en local es gratis, rápido y privado: no se gasta cuota de API en cada comparación. Groq se reserva solo para lo que de verdad lo necesita (generar texto). Para agregar conocimiento nuevo alcanza con tirar un `.txt` más en `docs/` y reiniciar el bot.
+
+---
+
 ## ✨ Novedades implementadas
 
 Estas funcionalidades fueron desarrolladas durante el proyecto para llevar el bot de una versión básica a una plataforma financiera completa:
@@ -146,6 +171,7 @@ Estas funcionalidades fueron desarrolladas durante el proyecto para llevar el bo
 - **Rate limiting** — máximo 10 mensajes por minuto por usuario para evitar spam y proteger las APIs.
 - **Logging con rotación** — registra todos los eventos en `bot.log` con archivos de hasta 5 MB y 3 backups.
 - **Enriquecimiento dinámico de contexto** — detecta si la pregunta es sobre dólar, cripto o inflación, consulta las APIs en tiempo real e inyecta los datos actuales en el prompt antes de enviárselo a la IA.
+- **RAG con modelo local** — base de conocimiento propia (`docs/*.txt`) indexada con embeddings locales (`sentence-transformers`); busca los fragmentos más relevantes por similitud de coseno y los inyecta en el prompt. La búsqueda no consume API; Groq solo redacta la respuesta final.
 - **Comparador de bancos** — wizard paso a paso con filtros por provincia, precio y comparación directa entre dos bancos.
 - **Alertas y recordatorios** — scheduler corriendo en hilo separado que revisa y envía alertas cada 30 segundos.
 - **Cotizaciones en tiempo real** — dólar (dolarapi.com), criptos (CoinGecko) y datos del BCRA (ArgentinaDatos).
