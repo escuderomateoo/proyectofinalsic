@@ -37,7 +37,7 @@ init_db()
 # ── Importaciones del bot ─────────────────────────────────────────────────────
 from apis.sentimiento import EstadoDelChat, analizador_sentimiento
 from apis.filtrado_de_texto import filtrar_texto
-from apis.groq_api_texto import get_groq_response
+from apis.groq_api_texto import get_groq_response, RATE_LIMIT
 from apis.obtencion_de_base_de_datos import load_bank_data
 from apis.groq_api_foto import describir_imagen, contexto_de_imagen
 from apis.groq_api_audio import transcribe_voice_with_groq
@@ -52,7 +52,7 @@ from apis.carpetas import (
     handle_transferir,
     handle_resumen,
 )
-from apis.graficos import generar_grafico_gastos, generar_grafico_sentimiento, generar_grafico_cripto, generar_grafico_dolar
+from apis.graficos import generar_grafico_gastos, generar_grafico_sentimiento, generar_grafico_cripto, generar_grafico_dolar, generar_grafico_centinela
 from apis.alertas import parsear_alerta, proxima_fecha_mensual
 from apis.rag import init_rag, buscar_contexto
 from apis.cotizaciones import (
@@ -66,6 +66,9 @@ from apis.comparador import (
     menu_principal, menu_provincias, menu_bancos,
     resultado_baratos, resultado_gratis, resultado_provincia, resultado_comparacion,
 )
+from intent_detector import detectar_intencion
+from watchers import parsear_watcher, cumple, describir_condicion, parsear_cancelacion
+from briefing import parsear_briefing
 
 load_dotenv()
 
@@ -84,6 +87,12 @@ _rate_timestamps: dict[int, list[float]] = defaultdict(list)
 RATE_LIMIT_MAX = 10     # mensajes máximos
 RATE_LIMIT_WINDOW = 60  # por ventana de N segundos
 MAX_HISTORY = 10        # últimos N mensajes del historial (5 intercambios)
+
+MSG_RATE_LIMIT = (
+    "⏳ Alcanzamos el límite de consultas a la IA por ahora.\n"
+    "Probá de nuevo en un rato 🙏 (los comandos de mercado, cotizaciones y "
+    "gastos siguen funcionando normalmente)."
+)
 
 
 # ── Enriquecimiento dinámico de contexto ─────────────────────────────────────
@@ -154,6 +163,27 @@ def add_to_history(chat_id: int, role: str, content: str) -> None:
         conversation_history[chat_id] = history[-MAX_HISTORY:]
 
 
+def enviar_md(chat_id: int, texto: str, reply_to: telebot.types.Message | None = None) -> None:
+    """Envía un mensaje en Markdown, con fallback a texto plano si el parser falla.
+
+    El Markdown legacy de Telegram rompe ante guiones bajos sueltos (típico de
+    los nombres de comando como /cancelar_centinela) o asteriscos sin cerrar.
+    Si eso pasa, reintenta sin formato para que la acción no se reporte como
+    fallida cuando en realidad se completó.
+    """
+    try:
+        if reply_to is not None:
+            bot.reply_to(reply_to, texto, parse_mode="Markdown")
+        else:
+            bot.send_message(chat_id, texto, parse_mode="Markdown")
+    except Exception as e:
+        logger.warning("Markdown inválido, reenvío en texto plano: %s", e)
+        if reply_to is not None:
+            bot.reply_to(reply_to, texto)
+        else:
+            bot.send_message(chat_id, texto)
+
+
 # ── Comandos ──────────────────────────────────────────────────────────────────
 
 @bot.message_handler(commands=["start"])
@@ -181,7 +211,9 @@ def welcome_message(message: telebot.types.Message):
         "• Tarifas y comparativa de bancos\n"
         "• Cotizaciones del dólar y cripto en tiempo real\n"
         "• Análisis de comprobantes de transferencia\n"
-        "• Recordatorios y gestión de gastos\n\n"
+        "• Recordatorios y gestión de gastos\n"
+        "• 🚨 Centinelas: te aviso cuando el dólar o una cripto cruzan un precio\n"
+        "• 🌅 Resumen financiero diario a la hora que elijas (/briefing)\n\n"
         "También podés escribirme cualquier consulta bancaria o financiera 👇",
         parse_mode="Markdown",
         reply_markup=menu,
@@ -225,6 +257,17 @@ def cmd_ayuda(message: telebot.types.Message):
         "/recordar [mensaje] el dia X — Recordatorio mensual\n"
         "/mis_alertas — Ver tus recordatorios activos\n"
         "/cancelar_alerta [id] — Cancelar un recordatorio\n\n"
+        "🚨 Centinelas de precio\n"
+        'Escribime: "avisame cuando el blue supere los 1500"\n'
+        '          "notificame si bitcoin baja de 60000"\n'
+        "Te aviso solo, con un gráfico, apenas se cumple\n"
+        "/mis_centinelas — Ver tus centinelas activos\n"
+        "/cancelar_centinela [id] — Cancelar un centinela\n\n"
+        "🌅 Resumen financiero diario\n"
+        "/briefing — Ver el resumen ahora (dólar, cripto, inflación)\n"
+        "/briefing HH:MM — Recibirlo todos los días a esa hora\n"
+        '          o decime: "mandame el resumen diario a las 9"\n'
+        "/briefing off — Desactivarlo\n\n"
         "📎 También podés enviar:\n"
         "• Imágenes o comprobantes de transferencia\n"
         "• Mensajes de voz"
@@ -326,7 +369,9 @@ def cmd_analizar_gastos(message: telebot.types.Message):
 
     response = get_groq_response(prompt, bank_data, max_tokens=1000)
 
-    if response:
+    if response == RATE_LIMIT:
+        bot.reply_to(message, MSG_RATE_LIMIT)
+    elif response:
         bot.reply_to(message, f"💡 *Análisis de tus gastos*\n\n{response}", parse_mode="Markdown")
     else:
         bot.reply_to(message, "❌ No pude generar el análisis. Intentá de nuevo.")
@@ -694,7 +739,388 @@ def cmd_cancelar_alerta(message: telebot.types.Message):
     bot.reply_to(message, "✅ Recordatorio cancelado." if eliminado else "❌ No encontré ese recordatorio.")
 
 
+# ── Centinelas de precio ──────────────────────────────────────────────────────
+
+def _simbolo_moneda(clase: str) -> str:
+    return "USD " if clase == "cripto" else "$"
+
+
+def _snapshot_precios(watchers: list[dict]) -> dict[tuple[str, str], float]:
+    """Precio actual de cada (clase, activo) presente en ``watchers``.
+
+    Hace como mucho una llamada al dólar y una a cripto (batch), sin importar
+    cuántos centinelas haya, para no saturar las APIs en cada tick.
+    """
+    precios: dict[tuple[str, str], float] = {}
+
+    if any(w["clase"] == "dolar" for w in watchers):
+        datos = obtener_dolar()
+        if datos:
+            for d in datos:
+                valor = d.get("venta") or d.get("compra")
+                if valor:
+                    precios[("dolar", d["casa"])] = float(valor)
+
+    coins = sorted({w["activo"] for w in watchers if w["clase"] == "cripto"})
+    if coins:
+        datos = obtener_cripto(coins)
+        if datos:
+            for c in coins:
+                info = datos.get(c)
+                if info and info.get("usd") is not None:
+                    precios[("cripto", c)] = float(info["usd"])
+
+    return precios
+
+
+def _notificar_disparo(chat_id: int, w: dict, precio: float) -> None:
+    """Avisa al usuario que su centinela se cumplió y manda el gráfico del cruce."""
+    simbolo = _simbolo_moneda(w["clase"])
+    verbo = "superó" if w["op"] == ">=" else "bajó de"
+    enviar_md(
+        chat_id,
+        "🚨 *¡Centinela disparado!*\n"
+        f"{w['emoji']} *{w['nombre']}* {verbo} el umbral de {simbolo}{w['umbral']:,.2f}\n"
+        f"📍 Precio actual: {simbolo}{precio:,.2f}",
+    )
+    try:
+        bot.send_chat_action(chat_id, "upload_photo")
+        historico = (
+            obtener_cripto_historico(w["activo"], days=7)
+            if w["clase"] == "cripto" else None
+        )
+        buf = generar_grafico_centinela(
+            w["nombre"], w["emoji"], precio, w["umbral"], w["op"], historico
+        )
+        bot.send_photo(chat_id, buf)
+    except Exception as e:
+        logger.error("Error generando gráfico de centinela para chat %d: %s", chat_id, e)
+
+
+def _crear_watcher_desde_texto(message: telebot.types.Message, w: dict) -> None:
+    """Guarda un centinela parseado y confirma, mostrando el precio actual."""
+    chat_id = message.chat.id
+    simbolo = _simbolo_moneda(w["clase"])
+
+    precio = _snapshot_precios([w]).get((w["clase"], w["activo"]))
+    wid = db.crear_watcher(
+        chat_id, w["clase"], w["activo"], w["nombre"], w["emoji"], w["op"], w["umbral"]
+    )
+    logger.info("Centinela %d creado para chat %d: %r", wid, chat_id, w)
+
+    cond = describir_condicion(w["op"], w["umbral"], w["clase"])
+    lineas = [
+        "🔔 *Centinela activado*",
+        f"{w['emoji']} *{w['nombre']}*",
+        f"Te aviso apenas {cond}.",
+    ]
+    if precio is not None:
+        lineas.append(f"📍 Precio ahora: {simbolo}{precio:,.2f}")
+        if cumple(w["op"], precio, w["umbral"]):
+            lineas.append("\n⚡ _Ya se cumple ahora mismo: te lo confirmo en unos segundos._")
+    lineas.append(f"\n🆔 Centinela #{wid} · lo reviso cada 30s")
+    lineas.append(f"Cancelalo con `/cancelar_centinela {wid}`")
+    enviar_md(chat_id, "\n".join(lineas))
+
+
+def _cancelar_watcher_desde_texto(message: telebot.types.Message, pedido: dict) -> None:
+    """Cancela centinelas según un pedido en lenguaje natural ya parseado."""
+    chat_id = message.chat.id
+    watchers = db.listar_watchers_usuario(chat_id)
+    if not watchers:
+        bot.reply_to(message, "No tenés centinelas de precio activos para cancelar.")
+        return
+
+    tipo = pedido["tipo"]
+
+    if tipo == "todos":
+        for w in watchers:
+            db.eliminar_watcher(w["id"])
+        bot.reply_to(message, f"✅ Cancelé tus {len(watchers)} centinelas de precio.")
+        return
+
+    if tipo == "id":
+        ok = db.cancelar_watcher_usuario(pedido["id"], chat_id)
+        bot.reply_to(
+            message,
+            f"✅ Centinela #{pedido['id']} cancelado."
+            if ok else f"❌ No encontré el centinela #{pedido['id']}. Mirá /mis_centinelas.",
+        )
+        return
+
+    if tipo == "activo":
+        coincidencias = [
+            w for w in watchers
+            if w["clase"] == pedido["clase"] and w["activo"] == pedido["activo"]
+        ]
+        if not coincidencias:
+            bot.reply_to(message, f"No tenés centinelas de {pedido['nombre']}.")
+            return
+        for w in coincidencias:
+            db.eliminar_watcher(w["id"])
+        plural = "centinela" if len(coincidencias) == 1 else "centinelas"
+        bot.reply_to(message, f"✅ Cancelé {len(coincidencias)} {plural} de {pedido['nombre']}.")
+        return
+
+    # tipo == "generico": quiere cancelar pero no aclaró cuál.
+    if len(watchers) == 1:
+        w = watchers[0]
+        db.eliminar_watcher(w["id"])
+        bot.reply_to(message, f"✅ Cancelé tu centinela de {w['nombre']}.")
+        return
+    lineas = ["Tenés varios centinelas, ¿cuál querés cancelar?\n"]
+    for w in watchers:
+        cond = describir_condicion(w["op"], w["umbral"], w["clase"])
+        lineas.append(f"#{w['id']} — {w['emoji']} {w['nombre']} ({cond})")
+    lineas.append('\nDecime, por ej.: "cancelá el centinela 2" o "cancelá el del blue".')
+    bot.reply_to(message, "\n".join(lineas))
+
+
+@bot.message_handler(commands=["mis_centinelas"])
+def cmd_mis_centinelas(message: telebot.types.Message):
+    watchers = db.listar_watchers_usuario(message.chat.id)
+    if not watchers:
+        bot.reply_to(
+            message,
+            "No tenés centinelas de precio activos.\n\n"
+            'Probá escribiéndome: "avisame cuando el blue supere los 1500"',
+        )
+        return
+    lineas = ["🔔 *Tus centinelas de precio:*\n"]
+    for w in watchers:
+        cond = describir_condicion(w["op"], w["umbral"], w["clase"])
+        lineas.append(f"`#{w['id']}` {w['emoji']} {w['nombre']} — {cond}")
+    lineas.append("\nCancelá uno con `/cancelar_centinela <id>`")
+    enviar_md(message.chat.id, "\n".join(lineas), reply_to=message)
+
+
+@bot.message_handler(commands=["cancelar_centinela"])
+def cmd_cancelar_centinela(message: telebot.types.Message):
+    partes = message.text.split()
+    if len(partes) < 2 or not partes[1].isdigit():
+        bot.reply_to(message, "Usá: /cancelar_centinela <id>\nVer IDs con /mis_centinelas")
+        return
+    ok = db.cancelar_watcher_usuario(int(partes[1]), message.chat.id)
+    bot.reply_to(message, "✅ Centinela cancelado." if ok else "❌ No encontré ese centinela.")
+
+
+@bot.message_handler(commands=["probar_centinela"])
+def cmd_probar_centinela(message: telebot.types.Message):
+    """Fuerza el disparo de un centinela para probarlo sin esperar al mercado.
+
+    Usa un precio simulado (el que pase el usuario, o el umbral si no lo pasa) y
+    NO elimina el centinela: la condición real sigue armada para el cruce de
+    verdad.
+    """
+    partes = message.text.split()
+    if len(partes) < 2 or not partes[1].isdigit():
+        bot.reply_to(
+            message,
+            "Usá: /probar_centinela <id> [precio]\n"
+            "Fuerza el disparo para probarlo. Ver IDs con /mis_centinelas",
+        )
+        return
+
+    wid = int(partes[1])
+    w = next((x for x in db.listar_watchers_usuario(message.chat.id) if x["id"] == wid), None)
+    if not w:
+        bot.reply_to(message, "❌ No encontré ese centinela. Ver IDs con /mis_centinelas")
+        return
+
+    if len(partes) >= 3:
+        try:
+            precio = float(partes[2].replace(",", ".").replace("$", ""))
+        except ValueError:
+            bot.reply_to(message, "❌ El precio simulado debe ser un número. Ej: /probar_centinela 3 1500")
+            return
+    else:
+        precio = w["umbral"]
+
+    bot.send_message(message.chat.id, "🧪 Simulando el disparo (el centinela sigue activo)...")
+    _notificar_disparo(message.chat.id, w, precio)
+
+
+# ── Briefing diario (resumen financiero) ──────────────────────────────────────
+
+def _componer_briefing(chat_id: int, datos_dolar: list[dict] | None) -> str:
+    """Arma el texto del resumen financiero: dólar, cripto, inflación y centinelas."""
+    from apis.cotizaciones import _CRIPTO_INFO
+
+    partes = [f"🌅 *Tu resumen financiero* — {datetime.now().strftime('%d/%m/%Y')}"]
+
+    if datos_dolar:
+        dd = {d["casa"]: d for d in datos_dolar}
+        of, bl = dd.get("oficial"), dd.get("blue")
+        sub = ["\n💵 *Dólar*"]
+        if of and of.get("venta"):
+            sub.append(f"   Oficial: ${of['venta']:,.2f}")
+        if bl and bl.get("venta"):
+            sub.append(f"   Blue: ${bl['venta']:,.2f}")
+        if of and bl and of.get("venta") and bl.get("venta"):
+            brecha = (bl["venta"] - of["venta"]) / of["venta"] * 100
+            sub.append(f"   Brecha blue/oficial: {brecha:.1f}%")
+        if len(sub) > 1:
+            partes.append("\n".join(sub))
+
+    datos_cr = obtener_cripto(["bitcoin", "ethereum"])
+    if datos_cr:
+        sub = ["\n🪙 *Cripto (USD)*"]
+        for cid in ("bitcoin", "ethereum"):
+            info = datos_cr.get(cid)
+            if not info:
+                continue
+            _, nom, tk = _CRIPTO_INFO.get(cid, ("", cid, cid.upper()))
+            precio = info.get("usd", 0)
+            cambio = info.get("usd_24h_change") or 0
+            flecha = "↑" if cambio >= 0 else "↓"
+            sub.append(f"   {nom} ({tk}): ${precio:,.2f}  {flecha} {cambio:+.1f}%")
+        if len(sub) > 1:
+            partes.append("\n".join(sub))
+
+    inf = _contexto_inflacion_texto()
+    if inf:
+        partes.append(f"\n📊 {inf}")
+
+    watchers = db.listar_watchers_usuario(chat_id)
+    if watchers:
+        sub = [f"\n🔔 *Tus centinelas ({len(watchers)})*"]
+        for w in watchers:
+            cond = describir_condicion(w["op"], w["umbral"], w["clase"])
+            sub.append(f"   {w['emoji']} {w['nombre']} — {cond}")
+        partes.append("\n".join(sub))
+
+    partes.append("\n_Que tengas un buen día 👋_")
+    return "\n".join(partes)
+
+
+def _enviar_briefing(chat_id: int) -> None:
+    """Envía el resumen financiero (texto + gráfico del dólar) a un usuario."""
+    datos_dolar = obtener_dolar()
+    enviar_md(chat_id, _componer_briefing(chat_id, datos_dolar))
+    if datos_dolar:
+        try:
+            bot.send_chat_action(chat_id, "upload_photo")
+            bot.send_photo(chat_id, generar_grafico_dolar(datos_dolar))
+        except Exception as e:
+            logger.error("Error generando gráfico del briefing para chat %d: %s", chat_id, e)
+
+
+def _activar_briefing(message: telebot.types.Message, hora: str) -> None:
+    """Programa el resumen diario a una hora. Si ya pasó hoy, arranca mañana."""
+    chat_id = message.chat.id
+    ahora = datetime.now()
+    ya_paso = ahora.strftime("%H:%M") >= hora
+    db.guardar_briefing(chat_id, hora, ahora.strftime("%Y-%m-%d") if ya_paso else None)
+    cuando = "mañana" if ya_paso else "hoy"
+    enviar_md(
+        chat_id,
+        f"✅ Activé tu *resumen financiero diario* a las {hora}.\n"
+        f"El primero te llega *{cuando}* a esa hora.\n\n"
+        "Podés verlo ahora mismo con /briefing 👀",
+        reply_to=message,
+    )
+
+
+def _despachar_briefing(message: telebot.types.Message, brief: dict) -> None:
+    accion = brief["accion"]
+    if accion == "activar":
+        _activar_briefing(message, brief["hora"])
+    elif accion == "desactivar":
+        ok = db.eliminar_briefing(message.chat.id)
+        bot.reply_to(message, "✅ Desactivé tu resumen diario." if ok else "No tenías un resumen diario activo.")
+    else:  # "ahora"
+        bot.send_chat_action(message.chat.id, "typing")
+        _enviar_briefing(message.chat.id)
+
+
+@bot.message_handler(commands=["briefing"])
+def cmd_briefing(message: telebot.types.Message):
+    partes = message.text.split()
+    if len(partes) == 1:
+        bot.send_chat_action(message.chat.id, "typing")
+        _enviar_briefing(message.chat.id)
+        return
+
+    arg = partes[1].lower()
+    if arg in ("off", "desactivar", "cancelar", "baja"):
+        ok = db.eliminar_briefing(message.chat.id)
+        bot.reply_to(message, "✅ Desactivé tu resumen diario." if ok else "No tenías un resumen diario activo.")
+        return
+
+    m = re.match(r"^(\d{1,2})(?::(\d{2}))?$", arg)
+    if not m:
+        bot.reply_to(
+            message,
+            "Usá:\n/briefing — verlo ahora\n/briefing HH:MM — activarlo diario\n/briefing off — desactivarlo",
+        )
+        return
+    h, mi = int(m.group(1)), int(m.group(2) or 0)
+    if not (0 <= h <= 23 and 0 <= mi <= 59):
+        bot.reply_to(message, "❌ Hora inválida. Ej: /briefing 09:00")
+        return
+    _activar_briefing(message, f"{h:02d}:{mi:02d}")
+
+
 # ── Mensajes de texto ─────────────────────────────────────────────────────────
+
+# Intenciones simples → handler de comando equivalente.
+_INTENT_SIMPLES = {
+    "grafico_dolar":  cmd_grafico_dolar,
+    "dolar":          cmd_dolar,
+    "grafico_cripto": cmd_grafico_cripto,
+    "cripto":         cmd_cripto,
+    "bcra":           cmd_bcra,
+    "resumen":        cmd_resumen,
+    "grafico_gastos": cmd_grafico_gastos,
+    "comparar":       cmd_comparar,
+    "mis_alertas":    cmd_mis_alertas,
+    "mi_perfil":      cmd_mi_perfil,
+    "mis_centinelas": cmd_mis_centinelas,
+}
+
+
+def _despachar_intencion(intencion: str, message: telebot.types.Message) -> None:
+    """Ejecuta el comando correspondiente a una intención detectada.
+
+    Los handlers de comandos parsean ``message.text`` para leer sus argumentos,
+    así que reconstruimos el texto del comando equivalente (ej. "/convertir 500
+    usd") y lo asignamos antes de invocarlos.
+    """
+    if intencion in _INTENT_SIMPLES:
+        message.text = "/" + intencion
+        _INTENT_SIMPLES[intencion](message)
+        return
+
+    if intencion.startswith("convertir:"):
+        _, monto, moneda = intencion.split(":")
+        message.text = f"/convertir {monto} {moneda}"
+        cmd_convertir(message)
+        return
+
+    if intencion.startswith("plazo_fijo:"):
+        partes = intencion.split(":")
+        message.text = "/plazo_fijo " + " ".join(partes[1:])
+        cmd_plazo_fijo(message)
+        return
+
+    if intencion.startswith("cripto_especifica:"):
+        ticker = intencion.split(":")[1]
+        message.text = f"/cripto {ticker}"
+        cmd_cripto(message)
+        return
+
+    if intencion.startswith("grafico_cripto_especifica:"):
+        ticker = intencion.split(":")[1]
+        message.text = f"/grafico_cripto {ticker}"
+        cmd_grafico_cripto(message)
+        return
+
+    if intencion.startswith("sentimiento:"):
+        frase = intencion.split(":", 1)[1]
+        message.text = f'/sentimiento "{frase}"'
+        cmd_sentimiento(message)
+        return
+
 
 @bot.message_handler(content_types=["text"])
 def handle_text_message(message: telebot.types.Message):
@@ -713,6 +1139,51 @@ def handle_text_message(message: telebot.types.Message):
         return
 
     if message.text.startswith("/"):
+        return
+
+    # Centinela de precio: "avisame cuando el blue supere los 1500". Va antes de
+    # detectar_intencion porque la frase menciona "dólar"/"bitcoin" y, si no,
+    # la interceptaría la intención de cotización simple.
+    watcher = parsear_watcher(message.text)
+    if watcher:
+        try:
+            _crear_watcher_desde_texto(message, watcher)
+        except Exception as e:
+            logger.error("Error creando centinela para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude crear el centinela. Intentá de nuevo.")
+        return
+
+    # Cancelación de centinela en lenguaje natural ("cancelá el del blue").
+    # Va antes de detectar_intencion porque la frase nombra el activo (dólar,
+    # bitcoin) y, si no, la interceptaría la intención de cotización.
+    cancelacion = parsear_cancelacion(message.text)
+    if cancelacion:
+        try:
+            _cancelar_watcher_desde_texto(message, cancelacion)
+        except Exception as e:
+            logger.error("Error cancelando centinela para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude cancelar el centinela. Intentá de nuevo.")
+        return
+
+    # Briefing diario ("mandame el resumen diario a las 9").
+    brief = parsear_briefing(message.text)
+    if brief:
+        try:
+            _despachar_briefing(message, brief)
+        except Exception as e:
+            logger.error("Error en briefing para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude procesar el resumen. Intentá de nuevo.")
+        return
+
+    # Detección de intención en lenguaje natural (antes de cualquier llamada a la IA)
+    intencion = detectar_intencion(message.text)
+    if intencion:
+        logger.info("Intención detectada para chat %d: %s", chat_id, intencion)
+        try:
+            _despachar_intencion(intencion, message)
+        except Exception as e:
+            logger.error("Error despachando intención %r para chat %d: %s", intencion, chat_id, e)
+            bot.reply_to(message, "❌ Hubo un error al procesar tu pedido. Intentá de nuevo.")
         return
 
     # Detección de tarjeta (Luhn)
@@ -734,7 +1205,9 @@ def handle_text_message(message: telebot.types.Message):
     user_input_enriquecido = _enriquecer_contexto(user_input)
     response = get_groq_response(user_input_enriquecido, bank_data, history)
 
-    if response:
+    if response == RATE_LIMIT:
+        bot.reply_to(message, MSG_RATE_LIMIT)
+    elif response:
         add_to_history(chat_id, "user", user_input)
         add_to_history(chat_id, "assistant", response)
         bot.reply_to(message, response)
@@ -742,11 +1215,34 @@ def handle_text_message(message: telebot.types.Message):
         bot.reply_to(
             message,
             "Lo siento, hubo un error al procesar tu consulta.\n"
-            "Podés escribirnos a info@agushermoso.com.ar para más información.",
+            "Podés escribirnos a bankratebot@samsung.com para más información.",
         )
 
 
 # ── Audio y foto ──────────────────────────────────────────────────────────────
+
+# Frases con las que Whisper "rellena" audio en silencio/ruido (vienen de los
+# subtítulos de YouTube con los que se entrenó). Si la transcripción es solo
+# esto, casi seguro el usuario no dijo nada útil.
+_TRANSCRIPCIONES_BASURA = (
+    "gracias por ver el video",
+    "gracias por ver el vídeo",
+    "gracias por ver",
+    "subtitulos realizados por",
+    "subtítulos realizados por",
+    "subtitulado por",
+    "amara.org",
+    "comunidad de amara",
+    "no olvides suscribirte",
+    "suscribete al canal",
+    "suscríbete al canal",
+)
+
+
+def _transcripcion_es_ruido(texto: str) -> bool:
+    t = texto.strip().lower()
+    return any(frase in t for frase in _TRANSCRIPCIONES_BASURA)
+
 
 @bot.message_handler(content_types=["voice"])
 def handle_voice_message(message: telebot.types.Message):
@@ -769,12 +1265,77 @@ def handle_voice_message(message: telebot.types.Message):
     with open(temp_file, "wb") as f:
         f.write(downloaded_file)
 
-    transcription = filtrar_texto(transcribe_voice_with_groq(temp_file))
+    transcripcion_cruda = transcribe_voice_with_groq(temp_file)
     os.remove(temp_file)
 
-    if not transcription:
+    if not transcripcion_cruda or not transcripcion_cruda.strip():
         bot.reply_to(message, "No pude transcribir el audio. Probá de nuevo.")
         return
+
+    # Whisper alucina frases de subtítulos de YouTube cuando el audio está en
+    # silencio, es muy corto o tiene ruido ("gracias por ver el video",
+    # "subtítulos por Amara.org"...). Las descartamos en vez de mandárselas al LLM.
+    if _transcripcion_es_ruido(transcripcion_cruda):
+        logger.info("Audio descartado como ruido/alucinación: %r", transcripcion_cruda)
+        bot.reply_to(
+            message,
+            "🤔 No te llegué a escuchar bien (el audio salió muy corto o con ruido).\n"
+            "Probá de nuevo hablando claro y un poco más fuerte 🎤",
+        )
+        return
+
+    # Le mostramos al usuario qué entendió: la transcripción es lossy (Whisper
+    # puede alucinar con audio corto o con ruido) y sin esto es imposible saber
+    # por qué un pedido por voz no se interpretó como esperábamos.
+    bot.reply_to(message, f"🎤 Entendí: «{transcripcion_cruda.strip()}»")
+
+    # Centinela de precio dictado por voz. Se parsea sobre la transcripción
+    # CRUDA (igual que el texto usa message.text sin filtrar), porque
+    # filtrar_texto elimina stopwords ("cuando", "el", "de"...) y mutila la frase.
+    watcher = parsear_watcher(transcripcion_cruda)
+    if watcher:
+        message.text = transcripcion_cruda
+        try:
+            _crear_watcher_desde_texto(message, watcher)
+        except Exception as e:
+            logger.error("Error creando centinela por voz para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude crear el centinela. Intentá de nuevo.")
+        return
+
+    cancelacion = parsear_cancelacion(transcripcion_cruda)
+    if cancelacion:
+        try:
+            _cancelar_watcher_desde_texto(message, cancelacion)
+        except Exception as e:
+            logger.error("Error cancelando centinela por voz para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude cancelar el centinela. Intentá de nuevo.")
+        return
+
+    brief = parsear_briefing(transcripcion_cruda)
+    if brief:
+        message.text = transcripcion_cruda
+        try:
+            _despachar_briefing(message, brief)
+        except Exception as e:
+            logger.error("Error en briefing por voz para chat %d: %s", chat_id, e)
+            bot.reply_to(message, "❌ No pude procesar el resumen. Intentá de nuevo.")
+        return
+
+    # Intención en lenguaje natural por voz (cotizaciones, listar centinelas,
+    # gráficos...), igual que el flujo de texto. Los handlers leen message.text.
+    message.text = transcripcion_cruda
+    intencion = detectar_intencion(transcripcion_cruda)
+    if intencion:
+        logger.info("Intención por voz para chat %d: %s", chat_id, intencion)
+        try:
+            _despachar_intencion(intencion, message)
+        except Exception as e:
+            logger.error("Error despachando intención por voz %r para chat %d: %s", intencion, chat_id, e)
+            bot.reply_to(message, "❌ Hubo un error al procesar tu pedido. Intentá de nuevo.")
+        return
+
+    # Para el resto (consulta libre a la IA) sí usamos el texto filtrado.
+    transcription = filtrar_texto(transcripcion_cruda)
 
     worker = get_or_create_worker(chat_id)
     worker.agregar_mensaje(transcription)
@@ -783,7 +1344,9 @@ def handle_voice_message(message: telebot.types.Message):
     history = conversation_history[chat_id]
     response = get_groq_response(transcription, bank_data, history)
 
-    if response:
+    if response == RATE_LIMIT:
+        bot.reply_to(message, MSG_RATE_LIMIT)
+    elif response:
         add_to_history(chat_id, "user", transcription)
         add_to_history(chat_id, "assistant", response)
         bot.reply_to(message, response)
@@ -967,10 +1530,55 @@ def callback_query(call: telebot.types.CallbackQuery):
     history = conversation_history[chat_id]
     bot.send_chat_action(chat_id, "typing")
     respuesta = get_groq_response(user_input, bank_data, history)
+    if respuesta == RATE_LIMIT:
+        bot.send_message(chat_id, MSG_RATE_LIMIT)
+        return
     if respuesta:
         add_to_history(chat_id, "user", user_input)
         add_to_history(chat_id, "assistant", respuesta)
     bot.send_message(chat_id, respuesta or "Error al procesar tu consulta.")
+
+
+def _chequear_watchers():
+    """Revisa los centinelas de precio contra los valores en vivo.
+
+    Cada centinela es de un solo disparo: una vez que se cumple, se notifica
+    con su gráfico y se elimina para no repetir el aviso.
+    """
+    watchers = db.listar_watchers()
+    if not watchers:
+        return
+    precios = _snapshot_precios(watchers)
+    for w in watchers:
+        precio = precios.get((w["clase"], w["activo"]))
+        if precio is None:
+            continue
+        if cumple(w["op"], precio, w["umbral"]):
+            try:
+                _notificar_disparo(w["codigo_chat"], w, precio)
+            except Exception as e:
+                logger.error("Error notificando centinela %d: %s", w["id"], e)
+            finally:
+                db.eliminar_watcher(w["id"])
+
+
+def _chequear_briefings():
+    """Envía los resúmenes diarios cuya hora llegó y no se mandaron hoy."""
+    briefings = db.listar_briefings()
+    if not briefings:
+        return
+    ahora = datetime.now()
+    hoy = ahora.strftime("%Y-%m-%d")
+    hhmm = ahora.strftime("%H:%M")
+    for b in briefings:
+        if b["ultimo_envio"] == hoy or hhmm < b["hora"]:
+            continue
+        try:
+            _enviar_briefing(b["codigo_chat"])
+        except Exception as e:
+            logger.error("Error enviando briefing a %d: %s", b["codigo_chat"], e)
+        finally:
+            db.marcar_briefing_enviado(b["codigo_chat"], hoy)
 
 
 def _scheduler():
@@ -991,7 +1599,18 @@ def _scheduler():
                     else:
                         db.eliminar_alerta(alerta["id"])
         except Exception as e:
-            logger.error("Error en scheduler: %s", e)
+            logger.error("Error en scheduler (alertas): %s", e)
+
+        try:
+            _chequear_watchers()
+        except Exception as e:
+            logger.error("Error en scheduler (centinelas): %s", e)
+
+        try:
+            _chequear_briefings()
+        except Exception as e:
+            logger.error("Error en scheduler (briefings): %s", e)
+
         time.sleep(30)
 
 

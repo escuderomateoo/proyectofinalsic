@@ -64,6 +64,22 @@ def init_db() -> None:
                 destinatario      TEXT,
                 timestamp         DATETIME DEFAULT CURRENT_TIMESTAMP
             );
+            CREATE TABLE IF NOT EXISTS watchers (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                codigo_chat INTEGER NOT NULL,
+                clase       TEXT NOT NULL,      -- 'dolar' | 'cripto'
+                activo      TEXT NOT NULL,      -- casa del dólar o coin_id
+                nombre      TEXT NOT NULL,      -- display legible
+                emoji       TEXT,
+                op          TEXT NOT NULL,      -- '>=' | '<='
+                umbral      REAL NOT NULL,
+                timestamp   DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS briefings (
+                codigo_chat  INTEGER PRIMARY KEY,  -- un resumen diario por usuario
+                hora         TEXT NOT NULL,        -- 'HH:MM' del envío
+                ultimo_envio TEXT                  -- 'YYYY-MM-DD' del último envío
+            );
         """)
     logger.info("Base de datos inicializada.")
     _migrate_existing_data()
@@ -242,3 +258,89 @@ def guardar_comprobante(
             "VALUES (?, ?, ?, ?, ?)",
             (monto, fecha_hora, numero_operacion, remitente, destinatario),
         )
+
+
+# ── Centinelas de precio (watchers) ───────────────────────────────────────────
+
+def crear_watcher(
+    codigo_chat: int, clase: str, activo: str, nombre: str, emoji: str, op: str, umbral: float
+) -> int:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "INSERT INTO watchers (codigo_chat, clase, activo, nombre, emoji, op, umbral) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (codigo_chat, clase, activo, nombre, emoji, op, umbral),
+        )
+        return cursor.lastrowid
+
+
+def listar_watchers() -> list[dict]:
+    """Todos los centinelas activos (lo usa el scheduler en cada tick)."""
+    with get_connection() as conn:
+        rows = conn.execute("SELECT * FROM watchers").fetchall()
+        return [dict(r) for r in rows]
+
+
+def listar_watchers_usuario(codigo_chat: int) -> list[dict]:
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM watchers WHERE codigo_chat = ? ORDER BY id",
+            (codigo_chat,),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
+def eliminar_watcher(id: int) -> None:
+    with get_connection() as conn:
+        conn.execute("DELETE FROM watchers WHERE id = ?", (id,))
+
+
+def cancelar_watcher_usuario(id: int, codigo_chat: int) -> bool:
+    with get_connection() as conn:
+        cursor = conn.execute(
+            "DELETE FROM watchers WHERE id = ? AND codigo_chat = ?",
+            (id, codigo_chat),
+        )
+        return cursor.rowcount > 0
+
+
+# ── Briefing diario ────────────────────────────────────────────────────────────
+
+def guardar_briefing(codigo_chat: int, hora: str, ultimo_envio: str | None = None) -> None:
+    """Crea o actualiza (upsert) el resumen diario de un usuario."""
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT INTO briefings (codigo_chat, hora, ultimo_envio) VALUES (?, ?, ?) "
+            "ON CONFLICT(codigo_chat) DO UPDATE SET "
+            "hora = excluded.hora, ultimo_envio = excluded.ultimo_envio",
+            (codigo_chat, hora, ultimo_envio),
+        )
+
+
+def obtener_briefing(codigo_chat: int) -> dict | None:
+    with get_connection() as conn:
+        row = conn.execute(
+            "SELECT * FROM briefings WHERE codigo_chat = ?", (codigo_chat,)
+        ).fetchone()
+        return dict(row) if row else None
+
+
+def listar_briefings() -> list[dict]:
+    """Todos los briefings activos (lo usa el scheduler en cada tick)."""
+    with get_connection() as conn:
+        rows = conn.execute("SELECT * FROM briefings").fetchall()
+        return [dict(r) for r in rows]
+
+
+def marcar_briefing_enviado(codigo_chat: int, fecha: str) -> None:
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE briefings SET ultimo_envio = ? WHERE codigo_chat = ?",
+            (fecha, codigo_chat),
+        )
+
+
+def eliminar_briefing(codigo_chat: int) -> bool:
+    with get_connection() as conn:
+        cursor = conn.execute("DELETE FROM briefings WHERE codigo_chat = ?", (codigo_chat,))
+        return cursor.rowcount > 0

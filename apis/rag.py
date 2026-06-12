@@ -7,7 +7,13 @@ logger = logging.getLogger(__name__)
 DOCS_DIR = Path(__file__).parent.parent / "docs"
 CHUNK_SIZE = 500
 CHUNK_OVERLAP = 80
-SIMILARITY_THRESHOLD = 0.28
+# Umbral de similitud coseno para inyectar contexto. Calibrado empíricamente:
+# saludos y charla casual ("hola", "todo bien?", "buen día") puntúan hasta ~0.46
+# contra chunks irrelevantes, mientras que las consultas reales (plazo fijo,
+# bitcoin, CVU, inflación) quedan en 0.52+. Con 0.50 se evita inyectar contexto
+# de cripto en mensajes que no lo piden. Las tarifas bancarias no dependen del
+# RAG (van por bank_data), así que subir el corte no degrada esas respuestas.
+SIMILARITY_THRESHOLD = 0.50
 TOP_K = 3
 
 _chunks: list[str] = []

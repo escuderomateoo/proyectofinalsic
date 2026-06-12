@@ -3,6 +3,8 @@
 Asistente conversacional para Telegram, impulsado por Groq e inteligencia artificial.
 Diseñado para responder consultas bancarias y financieras en español, con cotizaciones en tiempo real, análisis de gastos, recordatorios y mucho más.
 
+No es solo reactivo: entiende **lenguaje natural** (hablado o escrito) y es **proactivo** — te avisa solo cuando el dólar o una cripto cruzan un precio (centinelas) y te manda un resumen financiero a la hora que elijas (briefing diario).
+
 ---
 
 ## 🧩 Requisitos del Sistema
@@ -126,13 +128,46 @@ Luego buscá tu bot en Telegram y enviá `/start` para comenzar.
 
 ---
 
+### 🚨 Centinelas de precio (alertas proactivas)
+
+Vos definís un umbral y el bot **te avisa solo** —con un gráfico del cruce— apenas el dólar o una cripto lo tocan. Los creás, listás y cancelás **en lenguaje natural** (escrito o por voz), sin memorizar comandos.
+
+| Lo que decís / escribís | Qué hace |
+|---|---|
+| *"avisame cuando el blue supere los 1500"* | Crea un centinela. Cuando el blue cruza ese valor, te llega una notificación con la tarjeta del cruce. |
+| *"notificame si bitcoin baja de 60000"* | Igual, pero para criptos y en sentido descendente. El aviso incluye el gráfico de los últimos 7 días con la línea del umbral marcada y la zona de quiebre sombreada. |
+| *"mis centinelas"* | Lista tus centinelas activos. |
+| *"cancelá el centinela del blue"* / *"borrá la alerta de bitcoin"* | Cancela por activo. |
+| *"cancelá todos los centinelas"* | Cancela todos de una. |
+| `/mis_centinelas` | Lista tus centinelas (comando equivalente). |
+| `/cancelar_centinela [id]` | Cancela uno por su ID. |
+| `/probar_centinela [id] [precio]` | Fuerza el disparo para probarlo sin esperar al mercado (no borra el centinela). |
+
+> **Cómo funciona:** el scheduler (mismo hilo que los recordatorios) revisa cada 30 segundos los precios en vivo contra cada umbral. Cuando se cumple, dispara la notificación una sola vez y elimina el centinela. Activos soportados: todas las casas del dólar (oficial, blue, MEP, CCL, tarjeta, mayorista) y las 8 criptos del bot (BTC, ETH, SOL, BNB, USDT, ADA, XRP, DOGE).
+
+---
+
+### 🌅 Resumen financiero diario (briefing)
+
+Un resumen proactivo que el bot te manda **todos los días a la hora que elijas**: dólar (oficial, blue y brecha), Bitcoin y Ethereum, inflación del mes, tus centinelas activos y el gráfico del dólar.
+
+| Comando / frase | Qué hace |
+|---|---|
+| `/briefing` o *"mandame el resumen ahora"* | Te muestra el resumen al instante (ideal para verlo sin esperar). |
+| `/briefing 09:00` o *"mandame el resumen diario a las 9"* | Lo programa para que llegue todos los días a esa hora. |
+| `/briefing off` o *"desactivá el resumen diario"* | Lo da de baja. |
+
+> Si la hora que elegís ya pasó hoy, el primer envío arranca mañana. El scheduler controla la fecha del último envío para mandarlo una sola vez por día.
+
+---
+
 ### 📎 Contenido multimedia
 
 | Tipo de envío | Qué hace el bot |
 |---|---|
 | **Imagen de comprobante** | Extrae automáticamente los datos de la transferencia (monto, fecha, número de operación, remitente y destinatario) y los guarda en la base de datos. |
 | **Imagen general** | Describe el contenido de la imagen. Si no es bancaria, lo informa amablemente. |
-| **Mensaje de voz** | Transcribe el audio usando Whisper y responde como si fuera un mensaje de texto. |
+| **Mensaje de voz** | Transcribe el audio con Whisper y te muestra qué entendió (`🎤 Entendí: ...`). Por voz podés crear, listar y cancelar centinelas, pedir el briefing, consultar cotizaciones o charlar — todo el flujo de texto. Detecta y descarta las alucinaciones típicas de Whisper (audio en silencio o con ruido) y te pide repetir en vez de responder cualquier cosa. |
 | **Número de tarjeta** | Detecta automáticamente si el texto contiene un número de tarjeta y valida si es válido usando el algoritmo de Luhn. |
 
 ---
@@ -155,7 +190,7 @@ El bot incorpora un sistema **RAG** (Retrieval-Augmented Generation) para respon
 
 1. **Al arrancar (`init_rag`)** — el bot lee todos los `.txt` de la carpeta `docs/` (`bitcoin.txt`, `cripto_argentina.txt`, `cripto_general.txt`, `glosario_financiero.txt`), los parte en *chunks* de ~500 caracteres con 80 de solapamiento (cortando de forma "inteligente" en saltos de línea o puntos), y los convierte en vectores con el modelo local. Todo queda indexado en memoria.
 2. **Cuando escribís una pregunta** — `buscar_contexto()` convierte tu pregunta en un vector con el mismo modelo local y la compara contra todos los chunks usando similitud de coseno.
-3. **Filtrado** — se quedan con los **3 fragmentos más relevantes** (`TOP_K = 3`), pero solo si superan un umbral mínimo de parecido (`SIMILARITY_THRESHOLD = 0.28`). Si nada supera el umbral, no inyecta nada (evita meter ruido).
+3. **Filtrado** — se quedan con los **3 fragmentos más relevantes** (`TOP_K = 3`), pero solo si superan un umbral mínimo de parecido (`SIMILARITY_THRESHOLD = 0.50`). Si nada supera el umbral, no inyecta nada (evita meter ruido en saludos o charla casual).
 4. **Inyección en el prompt** — esos fragmentos se agregan al prompt bajo la etiqueta `[CONOCIMIENTO BASE — fragmentos relevantes]`, junto con los datos de mercado en tiempo real si corresponde, y recién ahí se envía todo a Groq para que redacte la respuesta.
 
 **¿Por qué local y no Groq?** Hacer la búsqueda en local es gratis, rápido y privado: no se gasta cuota de API en cada comparación. Groq se reserva solo para lo que de verdad lo necesita (generar texto). Para agregar conocimiento nuevo alcanza con tirar un `.txt` más en `docs/` y reiniciar el bot.
@@ -170,6 +205,11 @@ Estas funcionalidades fueron desarrolladas durante el proyecto para llevar el bo
 - **Historial de conversación** — el bot recuerda los últimos 10 mensajes de cada usuario para dar respuestas con contexto.
 - **Rate limiting** — máximo 10 mensajes por minuto por usuario para evitar spam y proteger las APIs.
 - **Logging con rotación** — registra todos los eventos en `bot.log` con archivos de hasta 5 MB y 3 backups.
+- **Centinelas de precio (alertas proactivas)** — el usuario define un umbral en lenguaje natural y el scheduler avisa solo, con un gráfico del cruce, cuando el dólar o una cripto lo tocan. De un solo disparo y persistidos en SQLite.
+- **Resumen financiero diario (briefing)** — resumen programable (dólar, cripto, inflación y centinelas) que el bot envía automáticamente a la hora elegida, todos los días.
+- **Comprensión de lenguaje natural** — entiende pedidos como "a cuánto está el dólar", "pasame el gráfico de bitcoin" o "cancelá el centinela del blue" y los mapea a la acción correcta, sin necesidad de usar el comando exacto. Funciona también por voz.
+- **Voz robusta** — muestra la transcripción (`🎤 Entendí: ...`) y filtra las alucinaciones típicas de Whisper en audio con ruido o silencio.
+- **Envío resiliente de Markdown** — si el formato falla (ej. guiones bajos de un comando), reintenta en texto plano para que una acción exitosa nunca se reporte como error.
 - **Enriquecimiento dinámico de contexto** — detecta si la pregunta es sobre dólar, cripto o inflación, consulta las APIs en tiempo real e inyecta los datos actuales en el prompt antes de enviárselo a la IA.
 - **RAG con modelo local** — base de conocimiento propia (`docs/*.txt`) indexada con embeddings locales (`sentence-transformers`); busca los fragmentos más relevantes por similitud de coseno y los inyecta en el prompt. La búsqueda no consume API; Groq solo redacta la respuesta final.
 - **Comparador de bancos** — wizard paso a paso con filtros por provincia, precio y comparación directa entre dos bancos.
@@ -179,6 +219,7 @@ Estas funcionalidades fueron desarrolladas durante el proyecto para llevar el bo
 - **Simulador de plazo fijo** — calcula ganancia, TNA y TEA con tasa real del mercado o la que el usuario indique.
 - **Convertidor de monedas** — convierte entre ARS y USD usando cotizaciones en tiempo real por tipo de cambio.
 - **Menú de inicio con botones** — `/start` muestra accesos rápidos a las funciones principales como botones interactivos.
+- **Módulos puros con tests** — la detección de intención, los centinelas y el briefing viven en módulos sin dependencias de red ni de Telegram, cubiertos con pytest (`test_intent_detector.py`, `test_watchers.py`, `test_briefing.py`). Se corren con `pytest -v` y validan el parseo de lenguaje natural sin esperar a las APIs.
 
 ---
 
