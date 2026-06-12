@@ -18,9 +18,10 @@ def transcribe_voice_with_groq(file_path: str) -> Optional[str]:
             transcription = groq_client.audio.transcriptions.create(
                 file=(file_path, file),
                 model="whisper-large-v3-turbo",
-                prompt="Consulta sobre bancos y tarifas",
+                prompt="Consulta sobre bancos, dólar, criptomonedas y tarifas en Argentina.",
                 response_format="json",
                 language="es",
+                temperature=0.0,  # reduce las alucinaciones de Whisper con audio pobre
             )
         return transcription.text
     except Exception as e:

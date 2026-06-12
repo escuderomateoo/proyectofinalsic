@@ -144,6 +144,96 @@ def generar_grafico_cripto(
     return buf
 
 
+def generar_grafico_centinela(
+    nombre: str,
+    emoji: str,
+    precio_actual: float,
+    umbral: float,
+    op: str,
+    historico: list[tuple[datetime, float]] | None = None,
+) -> io.BytesIO:
+    """Imagen del disparo de un centinela.
+
+    Si hay ``historico`` (criptos, vía CoinGecko) dibuja la curva de precios con
+    la línea del umbral punteada y la zona de quiebre sombreada, para que se
+    *vea* el cruce. Si no lo hay (dólar), arma una tarjeta tipo medidor con el
+    precio actual, el umbral y la flecha del cruce.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+
+    subio = op == ">="
+    color = "#4CAF50" if subio else "#F44336"
+    flecha = "▲" if subio else "▼"
+
+    fig, ax = plt.subplots(figsize=(10, 5), facecolor="#FFFFFF")
+
+    if historico and len(historico) >= 2:
+        fechas = [p[0] for p in historico]
+        valores = [p[1] for p in historico]
+
+        ax.plot(fechas, valores, color=color, linewidth=2.5, marker="o", markersize=4)
+        # Línea del umbral y sombreado de la zona de quiebre.
+        ax.axhline(umbral, color="#FF5722", linestyle="--", linewidth=1.8,
+                   label=f"Umbral: ${umbral:,.2f}")
+        tope = max(max(valores), umbral, precio_actual)
+        piso = min(min(valores), umbral, precio_actual)
+        if subio:
+            ax.axhspan(umbral, tope * 1.02, alpha=0.08, color=color)
+        else:
+            ax.axhspan(piso * 0.98, umbral, alpha=0.08, color=color)
+        # Marca el precio actual sobre el último punto.
+        ax.scatter([fechas[-1]], [precio_actual], color=color, s=130, zorder=5,
+                   edgecolor="white", linewidth=1.5)
+        ax.annotate(f"${precio_actual:,.2f}", (fechas[-1], precio_actual),
+                    textcoords="offset points", xytext=(-10, 12),
+                    fontsize=11, fontweight="bold", color=color, ha="right")
+
+        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
+        fig.autofmt_xdate(rotation=30)
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"${v:,.0f}"))
+        ax.grid(axis="y", alpha=0.25, linestyle="--")
+        ax.legend(loc="upper left", fontsize=10, framealpha=0.85)
+        ax.set_ylabel("Precio (USD)", fontsize=11)
+    else:
+        # Tarjeta tipo medidor: una barra horizontal de umbral vs precio actual.
+        lo = min(umbral, precio_actual)
+        hi = max(umbral, precio_actual)
+        margen = (hi - lo) * 0.6 + hi * 0.04
+        ax.set_xlim(lo - margen, hi + margen)
+        ax.set_ylim(0, 1)
+        ax.axvline(umbral, color="#FF5722", linestyle="--", linewidth=2)
+        ax.text(umbral, 0.78, f"Umbral\n${umbral:,.2f}", color="#FF5722",
+                fontsize=11, fontweight="bold", ha="center", va="center")
+        ax.scatter([precio_actual], [0.35], color=color, s=520, zorder=5,
+                   edgecolor="white", linewidth=2)
+        ax.text(precio_actual, 0.18, f"Ahora\n${precio_actual:,.2f}", color=color,
+                fontsize=12, fontweight="bold", ha="center", va="center")
+        # Zona de quiebre sombreada hacia el lado del cruce.
+        if subio:
+            ax.axvspan(umbral, ax.get_xlim()[1], alpha=0.08, color=color)
+        else:
+            ax.axvspan(ax.get_xlim()[0], umbral, alpha=0.08, color=color)
+        ax.get_yaxis().set_visible(False)
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"${v:,.0f}"))
+        for spine in ("left", "right", "top"):
+            ax.spines[spine].set_visible(False)
+
+    ax.set_title(
+        f"{nombre}  {flecha} {('superó' if subio else 'bajó de')} ${umbral:,.2f}\n"
+        f"{datetime.now().strftime('%d/%m/%Y %H:%M')} hs",
+        fontsize=13, fontweight="bold", pad=12, color="#212121",
+    )
+    fig.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", dpi=150, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    buf.seek(0)
+    return buf
+
+
 def generar_grafico_dolar(datos: list[dict]) -> io.BytesIO:
     import matplotlib
     matplotlib.use("Agg")

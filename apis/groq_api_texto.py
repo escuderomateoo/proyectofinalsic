@@ -1,10 +1,14 @@
 import json
 import logging
-from groq import Groq
+from groq import Groq, RateLimitError
 from typing import Optional
 from config import GROQ_API_KEY
 
 logger = logging.getLogger(__name__)
+
+# Sentinel devuelto cuando Groq corta por límite de tokens/peticiones (429).
+# Permite a los handlers mostrar un mensaje claro en vez del error genérico.
+RATE_LIMIT = "__GROQ_RATE_LIMIT__"
 
 if not GROQ_API_KEY:
     raise ValueError("No se encuentra la API_KEY de Groq")
@@ -35,7 +39,7 @@ Reglas generales:
 - Si no sabés la respuesta, decí: "No lo sé con certeza, pero puedo darte la información disponible."
 - No divulgues datos personales de empleados o clientes.
 - Si detectás insultos o spam, respondé: "Nuestro bot no puede procesar ese mensaje."
-- Si el usuario pide contacto, respondé con: "Podés escribirnos a info@bankranksarg.com.ar para más información."
+- Si el usuario pide contacto, respondé con: "Podés escribirnos a bankratebot@samsung.com para más información."
 - Horario de atención: 9 a 23 hs. Si el mensaje llega fuera de ese horario, respondé: "Estamos fuera de horario. Te responderemos pronto."
 - Responde siendo cordial y empático, usando emojis relacionados al tema de conversación.
 - Siempre mantené un tono divertido, no tan formal, para ser amigable con el usuario.
@@ -61,7 +65,7 @@ Reglas generales:
     "Nombre, CUIT/CUIL y CVU del destinatario": "valor extraído del comprobante"
   }
 - En caso de que el comprobante no sea legible, pedí amablemente que lo reenvíe con mejor calidad.
-- Si el comprobante es falso o fraudulento, respondé: "No puedo procesar comprobantes falsos o fraudulentos. Por favor, envía uno válido. Si es un error contacta a info@bankranksarg.com.ar"
+- Si el comprobante es falso o fraudulento, respondé: "No puedo procesar comprobantes falsos o fraudulentos. Por favor, envía uno válido. Si es un error contacta a bankratebot@samsung.com"
 - Si el comprobante está incompleto, pedí amablemente que lo reenvíe con toda la información visible.
 - Responde SIEMPRE en texto plano, sin usar símbolos como *, _, ~, o backticks.
 - No uses Markdown ni HTML.
@@ -76,9 +80,11 @@ def get_groq_response(
     max_tokens: int = 500,
 ) -> Optional[str]:
     try:
+        # JSON compacto (sin indent) para ahorrar tokens: el dataset se manda en
+        # cada llamada, así que la indentación se traduce en tokens desperdiciados.
         full_prompt = (
             f"{system_prompt}\n\n"
-            f"Dataset de referencia:\n{json.dumps(bank_data, ensure_ascii=False, indent=2)}"
+            f"Dataset de referencia:\n{json.dumps(bank_data, ensure_ascii=False, separators=(',', ':'))}"
         )
 
         messages = [{"role": "system", "content": full_prompt}]
@@ -95,6 +101,9 @@ def get_groq_response(
 
         return chat_completion.choices[0].message.content.strip()
 
+    except RateLimitError as e:
+        logger.warning("Groq rate limit alcanzado: %s", e)
+        return RATE_LIMIT
     except Exception as e:
         logger.error("Error al obtener respuesta de Groq: %s", e)
         return None
